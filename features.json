@@ -1,0 +1,282 @@
+[
+  {
+    "id": 1,
+    "category": "dashboard",
+    "description": "CPU usage card displays current load percentage",
+    "passes": true,
+    "verification": ["Open dashboard", "CPU card shows percentage with one decimal", "Value updates every 3 seconds via WebSocket"]
+  },
+  {
+    "id": 2,
+    "category": "dashboard",
+    "description": "Memory usage card displays used/total/available",
+    "passes": true,
+    "verification": ["Open dashboard", "Memory card shows percentage", "Sub-text shows used/total/available in human-readable format"]
+  },
+  {
+    "id": 3,
+    "category": "dashboard",
+    "description": "Uptime card displays system uptime in days",
+    "passes": true,
+    "verification": ["Open dashboard", "Uptime card shows formatted time", "Days count shown below"]
+  },
+  {
+    "id": 4,
+    "category": "dashboard",
+    "description": "CPU trend chart renders with Chart.js",
+    "passes": true,
+    "verification": ["Open dashboard", "CPU chart canvas is visible", "Line updates as new data arrives"]
+  },
+  {
+    "id": 5,
+    "category": "dashboard",
+    "description": "Memory trend chart renders with Chart.js",
+    "passes": true,
+    "verification": ["Open dashboard", "Memory chart canvas is visible", "Line updates as new data arrives"]
+  },
+  {
+    "id": 6,
+    "category": "dashboard",
+    "description": "Disk usage section shows mounted filesystems",
+    "passes": true,
+    "verification": ["Open dashboard", "Disk section lists filesystems", "Each shows progress bar, percentage, used/total/available"]
+  },
+  {
+    "id": 7,
+    "category": "dashboard",
+    "description": "Network I/O section shows interface stats",
+    "passes": true,
+    "verification": ["Open dashboard", "Network section lists interfaces", "Shows RX/TX bytes and rates"]
+  },
+  {
+    "id": 8,
+    "category": "dashboard",
+    "description": "Last update timestamp displays and refreshes",
+    "passes": true,
+    "verification": ["Open dashboard", "Last update text shows relative time", "Updates on each data refresh"]
+  },
+  {
+    "id": 9,
+    "category": "processes",
+    "description": "Process list loads top 100 processes by CPU",
+    "passes": true,
+    "verification": ["Navigate to /processes", "Table shows process list", "Count badge shows total"]
+  },
+  {
+    "id": 10,
+    "category": "processes",
+    "description": "Process search filters by name",
+    "passes": true,
+    "verification": ["Type in search box", "Table filters to matching processes", "Count updates"]
+  },
+  {
+    "id": 11,
+    "category": "processes",
+    "description": "Column sorting works for PID, name, CPU, memory",
+    "passes": true,
+    "verification": ["Click column header", "Rows reorder", "Arrow indicator shows direction", "Click again to reverse"]
+  },
+  {
+    "id": 12,
+    "category": "processes",
+    "description": "Process detail modal opens on row click",
+    "passes": true,
+    "verification": ["Click a process row", "Modal appears with PID, name, CPU, memory, user, state, command", "Close button works", "ESC key closes"]
+  },
+  {
+    "id": 13,
+    "category": "processes",
+    "description": "Kill process with confirmation dialog",
+    "passes": true,
+    "verification": ["Open process detail", "Click terminate button", "Confirm modal appears", "On confirm, DELETE request sent", "Toast shows result"]
+  },
+  {
+    "id": 14,
+    "category": "connection",
+    "description": "WebSocket connects and receives real-time stats",
+    "passes": true,
+    "verification": ["Open dashboard", "Status dot shows green (connected)", "Data updates without page refresh"]
+  },
+  {
+    "id": 15,
+    "category": "connection",
+    "description": "Polling fallback when WebSocket fails",
+    "passes": true,
+    "verification": ["Stop WebSocket (or block /ws)", "Status changes to disconnected", "App falls back to polling /api/stats", "Data still updates"]
+  },
+  {
+    "id": 16,
+    "category": "navigation",
+    "description": "Router navigation between dashboard and processes",
+    "passes": true,
+    "verification": ["Click '仪表盘' link", "Dashboard view loads", "Click '进程管理' link", "Processes view loads", "Active link is highlighted"]
+  },
+  {
+    "id": 17,
+    "category": "navigation",
+    "description": "Connection status indicator in navbar",
+    "passes": true,
+    "verification": ["Nav shows status dot", "Green when connected", "Red when disconnected", "Yellow when connecting", "Text label matches state"]
+  },
+  {
+    "id": 18,
+    "category": "api",
+    "description": "GET /api/stats returns system metrics",
+    "passes": true,
+    "verification": ["curl http://localhost:7777/api/stats", "Response has cpu, memory, disk, network, os, uptime fields", "HTTP 200"]
+  },
+  {
+    "id": 19,
+    "category": "api",
+    "description": "GET /api/processes returns process list",
+    "passes": true,
+    "verification": ["curl http://localhost:7777/api/processes", "Response has total and list fields", "list contains up to 100 entries sorted by CPU"]
+  },
+  {
+    "id": 20,
+    "category": "api",
+    "description": "DELETE /api/processes/:pid validates PID",
+    "passes": true,
+    "verification": ["Send DELETE with invalid PID (0, NaN)", "Returns 400 with error message"]
+  },
+  {
+    "id": 21,
+    "category": "ui",
+    "description": "Toast component shows success/error/info messages",
+    "passes": true,
+    "verification": ["Trigger a toast (e.g., kill process)", "Toast appears at top center", "Auto-dismisses after duration", "Correct color for type"]
+  },
+  {
+    "id": 22,
+    "category": "ui",
+    "description": "Confirm modal with cancel and confirm actions",
+    "passes": true,
+    "verification": ["Trigger confirm (e.g., kill process)", "Modal overlay appears", "Cancel closes modal", "Confirm triggers action", "ESC key closes"]
+  },
+  {
+    "id": 23,
+    "category": "ui",
+    "description": "Responsive layout works on mobile widths",
+    "passes": false,
+    "verification": ["Resize browser to 375px width", "Stats grid stacks vertically", "Charts stack vertically", "Process table scrolls horizontally", "Nav remains usable"]
+  },
+  {
+    "id": 24,
+    "category": "ui",
+    "description": "Loading spinner shows while data is fetching",
+    "passes": true,
+    "verification": ["Navigate to processes page", "Spinner shows briefly while loading", "Disappears when data arrives"]
+  },
+  {
+    "id": 25,
+    "category": "enhancement",
+    "description": "Dark mode theme toggle",
+    "passes": false,
+    "verification": ["Toggle dark mode button in nav", "All colors switch to dark palette", "Charts update colors", "Preference persists in localStorage"]
+  },
+  {
+    "id": 26,
+    "category": "enhancement",
+    "description": "Auto-refresh toggle for process list",
+    "passes": false,
+    "verification": ["Processes page has auto-refresh toggle", "When enabled, list refreshes every 5 seconds", "When disabled, only manual refresh works"]
+  },
+  {
+    "id": 27,
+    "category": "enhancement",
+    "description": "CPU per-core breakdown display",
+    "passes": false,
+    "verification": ["Dashboard shows per-core CPU bars", "Each core shows individual load percentage", "Updates in real-time"]
+  },
+  {
+    "id": 28,
+    "category": "enhancement",
+    "description": "System info panel (OS, hostname, kernel)",
+    "passes": false,
+    "verification": ["Dashboard shows system info section", "Displays OS distro, hostname, platform", "Static data loaded once"]
+  },
+  {
+    "id": 29,
+    "category": "enhancement",
+    "description": "Export process list to CSV",
+    "passes": false,
+    "verification": ["Processes page has export button", "Click downloads CSV file", "CSV contains PID, name, CPU, memory, user columns"]
+  },
+  {
+    "id": 30,
+    "category": "enhancement",
+    "description": "Chart time range selector (1min, 5min, 15min)",
+    "passes": false,
+    "verification": ["Dashboard charts have time range buttons", "Selecting range adjusts x-axis window", "Data points retained for selected range"]
+  },
+  {
+    "id": 31,
+    "category": "testing",
+    "description": "Backend API unit tests with vitest or jest",
+    "passes": false,
+    "verification": ["Run npm test in backend/", "Tests cover /api/stats, /api/processes, /api/processes/:pid", "All tests pass"]
+  },
+  {
+    "id": 32,
+    "category": "testing",
+    "description": "Frontend component tests",
+    "passes": false,
+    "verification": ["Run npm test in frontend/", "Tests cover Dashboard, Processes, Toast, ConfirmModal", "All tests pass"]
+  },
+  {
+    "id": 33,
+    "category": "devops",
+    "description": "Production build serves correctly from backend",
+    "passes": true,
+    "verification": ["Run npm run build in frontend/", "Start backend with npm start", "Open http://localhost:7777", "App loads and functions correctly"]
+  },
+  {
+    "id": 34,
+    "category": "security",
+    "description": "PID validation prevents killing system processes",
+    "passes": true,
+    "verification": ["Send DELETE /api/processes/0", "Returns 400 error", "Send DELETE /api/processes/1", "Returns 400 error", "PID <= 1 rejected"]
+  },
+  {
+    "id": 35,
+    "category": "enhancement",
+    "description": "Memory usage alert threshold notification",
+    "passes": false,
+    "verification": ["When memory exceeds 90%, warning banner appears on dashboard", "Banner shows current usage", "Dismissible but reappears if still high"]
+  },
+  {
+    "id": 36,
+    "category": "enhancement",
+    "description": "Process command-line search (not just name)",
+    "passes": false,
+    "verification": ["Search box searches both process name and command", "Typing a path matches command field", "Results include command-matched processes"]
+  },
+  {
+    "id": 37,
+    "category": "enhancement",
+    "description": "Disk I/O read/write speed display",
+    "passes": false,
+    "verification": ["Dashboard disk section shows read/write speeds", "Values update periodically", "Displayed in human-readable format (MB/s)"]
+  },
+  {
+    "id": 38,
+    "category": "enhancement",
+    "description": "Network traffic trend chart",
+    "passes": false,
+    "verification": ["Dashboard has network traffic chart", "Shows RX/TX over time", "Updates in real-time like CPU/memory charts"]
+  },
+  {
+    "id": 39,
+    "category": "enhancement",
+    "description": "Process tree view showing parent-child relationships",
+    "passes": false,
+    "verification": ["Processes page has tree view toggle", "Shows process hierarchy", "Expandable/collapsible nodes"]
+  },
+  {
+    "id": 40,
+    "category": "enhancement",
+    "description": "Keyboard shortcuts for navigation",
+    "passes": false,
+    "verification": ["Press 1 to go to dashboard", "Press 2 to go to processes", "Press / to focus search", "Press R to refresh"]
+  }
+]

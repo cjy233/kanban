@@ -61,3 +61,45 @@ When building or modifying frontend UI, always follow this visual verification l
 8. **Iterate** - Fix issues found in analysis, repeat steps 3-7 until quality is satisfactory
 
 This workflow ensures UI output is visually verified, not just syntactically correct.
+
+## Long-Running Agent Protocol
+
+This project uses a structured harness for multi-session agent work. Follow this protocol every session.
+
+### Session Startup Checklist
+
+Every session MUST begin with these steps, in order:
+
+1. Run `pwd` to confirm you're in the project root
+2. Read `git log --oneline -10` to see recent changes
+3. Read `claude-progress.txt` for context from previous sessions
+4. Read `features.json` to find the highest-priority incomplete feature (`"passes": false`)
+5. Run `bash init.sh` to verify the environment is working
+6. Only then begin implementation work
+
+### Feature List Rules
+
+`features.json` contains all tracked features with pass/fail status.
+
+- You may ONLY change the `"passes"` field from `false` to `true`
+- You may NOT remove, reorder, or edit feature descriptions
+- You may ADD new features at the end of the list with the next sequential ID
+- A feature can only be marked `true` after you have verified it works (build + test)
+- It is unacceptable to remove or edit tests/features because this could lead to missing or buggy functionality
+
+### Work Rules
+
+- Work on ONE feature per session. Do not attempt multiple features.
+- Pick the lowest-ID feature with `"passes": false`
+- Commit after completing each feature with a descriptive message referencing the feature ID
+- Update `claude-progress.txt` at the end of every session with what you did and what's next
+- If you break an existing feature while working, fix it before moving on
+- Run `bash init.sh` after implementation to verify nothing is broken
+
+### Progress Tracking
+
+`claude-progress.txt` is your handoff document between sessions. Update it with:
+- What feature you worked on
+- What you changed
+- Any issues encountered
+- What the next session should pick up

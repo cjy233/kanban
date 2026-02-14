@@ -1,0 +1,27 @@
+# Server Monitor - Agent Progress Log
+
+## Project Status: Active Development
+## Last Updated: 2026-02-14
+
+### Completed
+- Initial project setup (Express backend + Vue 3 frontend)
+- Dashboard with real-time CPU/memory charts (Chart.js)
+- Process list with search, sort, kill functionality
+- WebSocket real-time updates with polling fallback
+- Disk usage and network I/O display
+- Toast notifications and confirm modal components
+- GitHub repo created at cjy233/kanban
+
+### Current State
+- All core features implemented and functional
+- Backend runs on port 7777, frontend uses Vite dev server with proxy
+- No test suite yet
+- No CI/CD pipeline
+
+### Known Issues
+- None currently tracked
+
+### Next Session Notes
+- Read this file and git log first
+- Run init.sh to verify environment
+- Pick one feature from features.json to work on
