@@ -1,0 +1,8 @@
+Feature #43 完成。
+
+实现内容：
+- 为所有 .btn 按钮添加 active 按压缩放效果 (scale 0.95)
+- 实现 .btn--loading 状态，使用 CSS 伪元素创建旋转图标
+- 更新 ConfirmModal 使用新的 loading 样式
+- 为 theme-toggle 和 chart-range-btn 添加统一的按压效果
+- Code review 后修复了 scale 值不一致问题，移除了废弃的 loadingText prop，添加了 aria-busy 无障碍属性

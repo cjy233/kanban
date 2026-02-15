@@ -304,7 +304,7 @@
     "id": 44,
     "category": "visual-upgrade",
     "description": "表格组件升级：行 hover 高亮和斑马纹样式",
-    "passes": false,
+    "passes": true,
     "verification": ["表格行 hover 时背景变色", "奇偶行有细微色差", "暗色主题下对比度合适", "进程列表表格应用新样式"]
   },
   {

@@ -14,6 +14,8 @@
   --color-bg-subtle: #f8fafc;
   --color-bg-hover: #f1f5f9;
   --color-chart-grid: #f1f5f9;
+  --color-table-stripe: rgba(0, 0, 0, 0.02);
+  --color-table-hover: rgba(37, 99, 235, 0.08);
   --color-shadow: rgba(0, 0, 0, 0.1);
   --color-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
@@ -34,6 +36,8 @@
   --color-bg-subtle: #161b22;
   --color-bg-hover: #21262d;
   --color-chart-grid: #30363d;
+  --color-table-stripe: rgba(255, 255, 255, 0.03);
+  --color-table-hover: rgba(59, 130, 246, 0.15);
   --color-shadow: rgba(0, 0, 0, 0.4);
   --color-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
@@ -367,10 +371,28 @@ body {
   white-space: nowrap;
 }
 
-.process-table tr:hover {
-  background: var(--color-bg-subtle);
+/* 斑马纹样式：奇数行有细微色差 */
+.process-table tbody tr:nth-child(odd) {
+  background: var(--color-table-stripe);
+}
+
+.process-table tbody tr:nth-child(even) {
+  background: transparent;
+}
+
+/* 行 hover 高亮 */
+.process-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.process-table tbody tr:hover {
+  background: var(--color-table-hover);
   cursor: pointer;
-  transition: background 0.15s;
+}
+
+/* 空状态行不应用斑马纹 */
+.process-table tbody tr.no-stripe {
+  background: transparent !important;
 }
 
 .process-name {

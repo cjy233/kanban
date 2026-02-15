@@ -54,7 +54,7 @@
             <td><span class="state-badge" :class="getStateClass(proc.state)">{{ getStateLabel(proc.state) }}</span></td>
             <td>{{ proc.user }}</td>
           </tr>
-          <tr v-if="!loading && !fetchError && search && filteredProcesses.length === 0">
+          <tr class="no-stripe" v-if="!loading && !fetchError && search && filteredProcesses.length === 0">
             <td colspan="6" class="empty-state">未找到匹配的进程</td>
           </tr>
         </tbody>
