@@ -325,7 +325,7 @@
     "id": 47,
     "category": "visual-upgrade",
     "description": "加载状态：骨架屏 shimmer 效果",
-    "passes": false,
+    "passes": true,
     "verification": ["数据加载时显示骨架屏", "骨架屏有闪烁动画", "加载完成后平滑切换到真实内容"]
   },
   {

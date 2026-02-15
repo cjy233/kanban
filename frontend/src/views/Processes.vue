@@ -100,7 +100,18 @@
         <button class="btn btn-primary" @click="fetchProcesses">重试</button>
       </div>
 
-      <div v-if="loading" class="loading">
+      <div v-if="loading && processes.length === 0" class="skeleton-table">
+        <div class="skeleton-row" v-for="i in 8" :key="i">
+          <SkeletonLoader variant="text" width="60px" height="16px" />
+          <SkeletonLoader variant="text" width="120px" height="16px" />
+          <SkeletonLoader variant="text" width="80px" height="16px" />
+          <SkeletonLoader variant="text" width="80px" height="16px" />
+          <SkeletonLoader variant="text" width="50px" height="16px" />
+          <SkeletonLoader variant="text" width="60px" height="16px" />
+        </div>
+      </div>
+
+      <div v-else-if="loading" class="loading">
         <div class="spinner"></div>
         加载中...
       </div>
@@ -178,6 +189,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 import Toast from '../components/Toast.vue'
+import SkeletonLoader from '../components/SkeletonLoader.vue'
 
 const processes = ref([])
 const loading = ref(false)
@@ -509,5 +521,26 @@ onUnmounted(() => {
 .modal-enter-from .modal,
 .modal-leave-to .modal {
   transform: scale(0.95);
+}
+
+/* 骨架屏表格样式 */
+.skeleton-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.skeleton-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px 100px 60px 80px;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.skeleton-row:last-child {
+  border-bottom: none;
 }
 </style>

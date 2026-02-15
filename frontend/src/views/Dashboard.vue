@@ -8,7 +8,8 @@
       <button class="mem-alert-dismiss" @click="dismissMemAlert">✕</button>
     </div>
 
-    <template v-if="dataLoaded">
+    <Transition name="skeleton-fade" mode="out-in">
+      <div v-if="dataLoaded" key="content" class="dashboard-content">
       <div class="stats-grid">
         <div class="stat-card stat-card--cpu">
           <div class="stat-header">
@@ -151,12 +152,51 @@
           </div>
         </div>
       </div>
-    </template>
+      </div>
 
-    <div v-else class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>加载系统信息...</p>
-    </div>
+      <!-- 骨架屏加载状态 -->
+      <div v-else key="skeleton" class="skeleton-container">
+          <!-- 统计卡片骨架 -->
+          <div class="stats-grid">
+            <div class="stat-card skeleton-card" v-for="i in 3" :key="i">
+              <SkeletonLoader variant="text" width="60%" height="14px" />
+              <SkeletonLoader variant="text" width="40%" height="32px" style="margin-top: 12px" />
+              <SkeletonLoader variant="text" width="80%" height="12px" style="margin-top: 8px" />
+            </div>
+          </div>
+
+          <!-- CPU 核心骨架 -->
+          <div class="cpu-cores-section skeleton-section">
+            <SkeletonLoader variant="text" width="120px" height="20px" style="margin-bottom: 16px" />
+            <div class="cpu-cores-grid">
+              <div class="skeleton-core-item" v-for="i in 4" :key="i">
+                <SkeletonLoader variant="text" width="50px" height="14px" />
+                <SkeletonLoader variant="text" width="100%" height="8px" style="margin-top: 8px" />
+              </div>
+            </div>
+          </div>
+
+          <!-- 图表骨架 -->
+          <div class="charts-grid">
+            <SkeletonLoader variant="text" width="100px" height="14px" style="margin-bottom: 8px" />
+            <div class="chart-container skeleton-chart" v-for="i in 2" :key="i">
+              <SkeletonLoader variant="text" width="120px" height="18px" style="margin-bottom: 12px" />
+              <SkeletonLoader variant="chart" height="180px" />
+            </div>
+          </div>
+
+          <!-- 系统信息骨架 -->
+          <div class="system-info-section skeleton-section">
+            <SkeletonLoader variant="text" width="80px" height="20px" style="margin-bottom: 16px" />
+            <div class="skeleton-info-grid">
+              <div class="skeleton-info-item" v-for="i in 4" :key="i">
+                <SkeletonLoader variant="text" width="60px" height="12px" />
+                <SkeletonLoader variant="text" width="120px" height="14px" style="margin-top: 4px" />
+              </div>
+            </div>
+          </div>
+        </div>
+    </Transition>
   </div>
 </template>
 
@@ -164,6 +204,7 @@
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { Chart, registerables } from 'chart.js'
 import AnimatedNumber from '../components/AnimatedNumber.vue'
+import SkeletonLoader from '../components/SkeletonLoader.vue'
 
 Chart.register(...registerables)
 
@@ -989,5 +1030,55 @@ onUnmounted(() => {
 [data-theme="dark"] .disk-section:hover,
 [data-theme="dark"] .network-section:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* 骨架屏过渡动画 */
+.skeleton-fade-enter-active,
+.skeleton-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.skeleton-fade-enter-from,
+.skeleton-fade-leave-to {
+  opacity: 0;
+}
+
+/* 骨架屏容器 */
+.skeleton-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.skeleton-section {
+  padding: 20px;
+}
+
+.skeleton-core-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skeleton-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.skeleton-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skeleton-chart {
+  padding: 16px;
 }
 </style>
