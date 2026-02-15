@@ -8,5 +8,9 @@ export default defineConfig({
       '/api': 'http://localhost:7777',
       '/ws': { target: 'ws://localhost:7777', ws: true }
     }
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true
   }
 })

@@ -1,0 +1,6 @@
+Feature #31 done. Here's what I did:
+
+- Refactored `backend/server.js` into `backend/app.js` (Express app export) + `server.js` (entry point with WebSocket/listen) so the app can be imported without starting the server
+- Installed vitest + supertest as dev dependencies
+- Created `backend/server.test.js` with 10 tests covering all three API endpoints: `GET /api/stats` (3 tests), `GET /api/processes` (3 tests), `DELETE /api/processes/:pid` (4 tests)
+- All tests pass, frontend build works, init.sh smoke test passes

@@ -220,7 +220,7 @@
     "id": 32,
     "category": "testing",
     "description": "Frontend component tests",
-    "passes": false,
+    "passes": true,
     "verification": ["Run npm test in frontend/", "Tests cover Dashboard, Processes, Toast, ConfirmModal", "All tests pass"]
   },
   {
