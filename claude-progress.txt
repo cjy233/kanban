@@ -35,19 +35,19 @@
 - Feature #44: 表格组件升级 - COMPLETED
 - Feature #47: 加载状态骨架屏 shimmer 效果 - COMPLETED
 - Feature #48: 图表样式升级 - COMPLETED
+- Feature #49: 后端 API：GET /api/claude-config 获取合并配置 - COMPLETED
 
-### Session 2026-02-16 (Feature #48)
-- 新增 createGradient 函数创建垂直渐变填充
-- 新增 getChartColors 函数根据亮/暗主题返回适配的颜色配置
-- 新增 getTooltipConfig 函数配置精致的 tooltip 样式（圆角、内边距、主题适配）
-- 修改 initCharts 使用渐变填充和新 tooltip 配置
-- 修改 updateChartTheme 在主题切换时更新渐变和颜色
-- 增强 hover 状态：pointHoverRadius、pointHoverBackgroundColor、pointHoverBorderColor
-- Code review 后修复：tooltip callback 添加 null 安全检查
-- 构建验证通过
+### Session 2026-02-16 (Feature #49)
+- 新增 backend/routes/claude-config.js 路由文件
+- 实现 GET /api/claude-config 接口，读取并合并 ~/.claude/settings.json 和 .claude.json
+- 使用 deepMerge 函数实现深度合并，项目配置优先级高于全局配置
+- 确保返回的配置始终包含 env 和 mcpServers 字段（即使为空对象）
+- Code review 后修复：调整 spread 操作符顺序，确保默认值不被 null 覆盖
+- 在 app.js 中注册路由
+- 构建验证通过，API 测试通过
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Start with Feature #49: 后端 API：GET /api/claude-config 获取合并配置
+- Start with Feature #50: 后端 API：PUT /api/claude-config/env 更新环境变量
 - Reference design doc for API specifications
