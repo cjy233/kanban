@@ -171,7 +171,7 @@
     "id": 25,
     "category": "enhancement",
     "description": "Dark mode theme toggle",
-    "passes": false,
+    "passes": true,
     "verification": ["Toggle dark mode button in nav", "All colors switch to dark palette", "Charts update colors", "Preference persists in localStorage"]
   },
   {

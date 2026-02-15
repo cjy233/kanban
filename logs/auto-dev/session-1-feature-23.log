@@ -1,0 +1,3 @@
+Feature #23 done. Here's what I changed:
+
+Added responsive CSS to `frontend/src/assets/style.css` — a `@media (min-width: 768px)` breakpoint that expands the stats grid to 3 columns, charts grid to 2 columns, system info to 3 columns, and switches the toolbar to horizontal layout on desktop. The mobile-first defaults (single column stacking) were already in place. Also added `min-width: 600px` on the process table to ensure horizontal scrolling on narrow screens, and made the nav `flex-wrap` with `height: auto` so it stays usable at 375px. Added a matching scoped media query in `Dashboard.vue` for the charts grid since scoped styles override globals.

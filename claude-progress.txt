@@ -1,7 +1,7 @@
 # Server Monitor - Agent Progress Log
 
 ## Project Status: Active Development
-## Last Updated: 2026-02-14
+## Last Updated: 2026-02-15
 
 ### Completed
 - Initial project setup (Express backend + Vue 3 frontend)
@@ -11,12 +11,16 @@
 - Disk usage and network I/O display
 - Toast notifications and confirm modal components
 - GitHub repo created at cjy233/kanban
+- Feature #23: Responsive layout works on mobile widths
 
 ### Current State
 - All core features implemented and functional
 - Backend runs on port 7777, frontend uses Vite dev server with proxy
-- No test suite yet
-- No CI/CD pipeline
+- Responsive CSS added: mobile-first layout with 768px desktop breakpoint
+- Stats grid stacks vertically on mobile, 3-col on desktop
+- Charts stack vertically on mobile, 2-col on desktop
+- Process table scrolls horizontally on narrow screens (min-width: 600px)
+- Nav wraps gracefully at narrow widths
 
 ### Known Issues
 - None currently tracked
@@ -24,4 +28,4 @@
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick one feature from features.json to work on
+- Pick next feature from features.json (lowest ID with passes: false)

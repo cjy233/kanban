@@ -161,6 +161,7 @@ let pollInterval = null
 let reconnectAttempts = 0
 let reconnectTimer = null
 let lastUpdateTimer = null
+let themeObserver = null
 
 const MAX_RECONNECT_ATTEMPTS = 5
 const cpuHistory = Array(30).fill(0)
@@ -196,13 +197,18 @@ const formatUptime = (seconds) => {
   return `${h}小时 ${m}分钟`
 }
 
+const getChartGridColor = () => {
+  return getComputedStyle(document.documentElement).getPropertyValue('--color-chart-grid').trim() || '#f1f5f9'
+}
+
 const initCharts = () => {
+  const gridColor = getChartGridColor()
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
     animation: { duration: 0 },
     scales: {
-      y: { min: 0, max: 100, grid: { color: '#f1f5f9' } },
+      y: { min: 0, max: 100, grid: { color: gridColor } },
       x: { display: false }
     },
     plugins: { legend: { display: false } }
@@ -239,6 +245,18 @@ const initCharts = () => {
     },
     options: commonOptions
   })
+}
+
+const updateChartTheme = () => {
+  const gridColor = getChartGridColor()
+  if (cpuChart) {
+    cpuChart.options.scales.y.grid.color = gridColor
+    cpuChart.update('none')
+  }
+  if (memChart) {
+    memChart.options.scales.y.grid.color = gridColor
+    memChart.update('none')
+  }
 }
 
 const updateCharts = () => {
@@ -354,9 +372,16 @@ onMounted(async () => {
   lastUpdateTimer = setInterval(() => {
     lastUpdateTime.value = lastUpdateTime.value
   }, 1000)
+
+  themeObserver = new MutationObserver(() => updateChartTheme())
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
 })
 
 onUnmounted(() => {
+  if (themeObserver) {
+    themeObserver.disconnect()
+    themeObserver = null
+  }
   if (reconnectTimer) {
     clearTimeout(reconnectTimer)
     reconnectTimer = null

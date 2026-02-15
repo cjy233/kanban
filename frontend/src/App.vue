@@ -9,6 +9,9 @@
       <div class="nav-links">
         <router-link to="/">仪表盘</router-link>
         <router-link to="/processes">进程管理</router-link>
+        <button class="theme-toggle" @click="toggleTheme" :title="isDark ? '切换亮色模式' : '切换暗色模式'">
+          {{ isDark ? '☀️' : '🌙' }}
+        </button>
       </div>
     </nav>
 
@@ -17,9 +20,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const connectionStatus = ref('disconnected')
+const isDark = ref(false)
 
 const statusTitle = computed(() => {
   const titles = {
@@ -34,6 +38,22 @@ const statusTitle = computed(() => {
 const updateStatus = (status) => {
   connectionStatus.value = status
 }
+
+const applyTheme = (dark) => {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+}
+
+const toggleTheme = () => {
+  isDark.value = !isDark.value
+  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
+  applyTheme(isDark.value)
+}
+
+onMounted(() => {
+  const saved = localStorage.getItem('theme')
+  isDark.value = saved === 'dark'
+  applyTheme(isDark.value)
+})
 </script>
 
 <style scoped>
@@ -75,5 +95,20 @@ const updateStatus = (status) => {
 .nav-links a.router-link-active,
 .nav-links a.router-link-exact-active {
   border-bottom-color: var(--color-primary);
+}
+
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  line-height: 1;
+  transition: background 0.2s;
+}
+
+.theme-toggle:hover {
+  background: var(--color-bg-hover);
 }
 </style>
