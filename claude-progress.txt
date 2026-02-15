@@ -34,15 +34,16 @@
 - Feature #42: 卡片组件升级 - COMPLETED
 - Feature #44: 表格组件升级 - COMPLETED
 
-### Session 2026-02-16 (Feature #46)
-- 创建 AnimatedNumber.vue 组件，使用 requestAnimationFrame 实现数字平滑过渡
-- 组件特性：ease-out 缓动函数、tabular-nums 防止布局抖动、NaN 防护
-- 在 Dashboard.vue 中替换 CPU/内存/核心负载/磁盘使用率的数字显示
-- Code review 通过，构建验证通过
-- 技术说明：CSS transition 无法直接动画文本内容，使用 requestAnimationFrame 是正确方案
+### Session 2026-02-16 (Feature #47)
+- 创建 SkeletonLoader.vue 组件，支持 text/card/chart/table-row/circle 五种变体
+- 实现 shimmer 闪烁动画效果（CSS keyframes + background-position 动画）
+- 在 Dashboard.vue 中集成骨架屏，使用单个 Transition 实现平滑过渡
+- 在 Processes.vue 中集成表格骨架屏（首次加载时显示）
+- Code review 后修复：重构 Transition 结构、删除无效的暗色主题 CSS 规则
+- 构建验证通过
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Start with Feature #47: 加载状态：骨架屏 shimmer 效果
+- Start with Feature #48: 后端 API：读取 Claude Code 配置
 - Reference design doc for visual specifications
