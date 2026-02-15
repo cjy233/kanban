@@ -283,7 +283,7 @@
     "id": 41,
     "category": "visual-upgrade",
     "description": "升级全局配色系统：亮色主题使用 #fafbfc 背景、#0d1117 暗色背景，优化 CSS 变量",
-    "passes": false,
+    "passes": true,
     "verification": ["style.css 包含新的 CSS 变量定义", "亮色主题背景为微灰白", "暗色主题背景为 GitHub 风格深黑", "所有组件正确引用变量"]
   },
   {
