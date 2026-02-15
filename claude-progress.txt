@@ -20,7 +20,7 @@
 - Feature #30: Chart time range selector (1min, 5min, 15min)
 - Feature #31: Backend API unit tests with vitest
 - Feature #32: Frontend component tests with vitest
-- Feature #35: Memory usage alert threshold notification
+- Feature #36: Process command-line search (not just name)
 
 ### Current State
 - All core features implemented and functional
@@ -36,10 +36,12 @@
 - Frontend tests: 27 vitest tests across 4 files covering Toast, ConfirmModal, Dashboard, Processes. Uses @vue/test-utils with jsdom. Chart.js and WebSocket mocked. Run with `cd frontend && npm test`.
 - Memory alert: Warning banner appears on dashboard when memory > 90%. Shows current usage percentage and used/total bytes. Dismissible via X button, reappears if memory drops below 90% then exceeds again. Dark mode compatible.
 
+- Process command-line search: Extended filteredProcesses computed in Processes.vue to also match against p.command (in addition to p.name and p.pid). Updated search placeholder to "搜索进程名称或命令...". Backend already returned command field, so no backend changes needed.
+
 ### Known Issues
 - None currently tracked
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick next feature from features.json (lowest ID with passes: false) — should be #36
+- Pick next feature from features.json (lowest ID with passes: false) — should be #37
