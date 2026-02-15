@@ -297,7 +297,7 @@
     "id": 43,
     "category": "visual-upgrade",
     "description": "按钮组件升级：添加 active 按压反馈和 loading 状态",
-    "passes": false,
+    "passes": true,
     "verification": ["按钮点击时有按压缩放效果", "loading 状态显示旋转图标", "禁用状态样式正确", "所有按钮风格统一"]
   },
   {

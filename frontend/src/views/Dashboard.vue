@@ -958,6 +958,10 @@ onUnmounted(() => {
   color: var(--color-primary, #2563eb);
 }
 
+.chart-range-btn:active {
+  transform: scale(0.95);
+}
+
 .chart-range-btn.active {
   background: var(--color-primary, #2563eb);
   border-color: var(--color-primary, #2563eb);

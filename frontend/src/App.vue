@@ -144,10 +144,14 @@ onUnmounted(() => {
   font-size: 16px;
   padding: 4px 8px;
   line-height: 1;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.15s;
 }
 
 .theme-toggle:hover {
   background: var(--color-bg-hover);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
 }
 </style>

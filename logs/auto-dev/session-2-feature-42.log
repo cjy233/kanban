@@ -1,0 +1,7 @@
+Feature #42 完成。
+
+改动摘要：
+- 为 `.stat-card` 添加 hover 效果：`translateY(-2px)` 微上浮 + 阴影加深，过渡 0.15s
+- 为 `.system-info-section`、`.disk-section`、`.network-section` 添加相同效果
+- 暗色主题下 hover 阴影更深 (rgba 0.4)
+- 已提交并推送到 main 分支

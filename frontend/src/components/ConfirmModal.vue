@@ -12,8 +12,8 @@
           </div>
           <div class="confirm-footer">
             <button class="btn btn-secondary" @click="handleCancel" :disabled="loading">{{ cancelText }}</button>
-            <button :class="['btn', confirmClass]" @click="handleConfirm" :disabled="loading">
-              {{ loading ? loadingText : confirmText }}
+            <button :class="['btn', confirmClass, { 'btn--loading': loading }]" @click="handleConfirm" :disabled="loading" :aria-busy="loading">
+              {{ confirmText }}
             </button>
           </div>
         </div>
@@ -32,8 +32,7 @@ const props = defineProps({
   confirmText: { type: String, default: '确定' },
   cancelText: { type: String, default: '取消' },
   confirmClass: { type: String, default: 'btn-danger' },
-  loading: { type: Boolean, default: false },
-  loadingText: { type: String, default: '处理中...' }
+  loading: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['confirm', 'cancel', 'update:show'])
