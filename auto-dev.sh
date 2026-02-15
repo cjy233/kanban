@@ -241,10 +241,7 @@ while true; do
   echo ""
 
   # Run Claude in current terminal, log to file
-  (
-    echo "$PROMPT"
-    claude --dangerously-skip-permissions
-  ) 2>&1 | tee "$LOG_FILE"
+  claude -p "$PROMPT" --dangerously-skip-permissions 2>&1 | tee "$LOG_FILE"
   CLAUDE_EXIT=$?
 
   echo ""
