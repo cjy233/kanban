@@ -1,0 +1,7 @@
+Feature #45 完成。
+
+实现了页面切换过渡动画：
+- 使用 Vue `<transition>` 组件包裹 `<router-view>`
+- fade（淡入淡出）+ slide（从右侧滑入 20px）效果
+- 动画时长 150ms
+- 已通过 Playwright 截图验证和 code review

@@ -14,7 +14,7 @@
           <div class="stat-header">
             <span class="stat-label">CPU 使用率</span>
           </div>
-          <div class="stat-value cpu">{{ cpuUsage.toFixed(1) }}%</div>
+          <div class="stat-value cpu"><AnimatedNumber :value="cpuUsage" :decimals="1" suffix="%" /></div>
           <div class="stat-sub">{{ systemInfo?.cpuCores || '-' }} 核心</div>
         </div>
 
@@ -22,7 +22,7 @@
           <div class="stat-header">
             <span class="stat-label">内存使用</span>
           </div>
-          <div class="stat-value memory">{{ memUsage.toFixed(1) }}%</div>
+          <div class="stat-value memory"><AnimatedNumber :value="memUsage" :decimals="1" suffix="%" /></div>
           <div class="stat-sub">
             已用 {{ formatBytes(memUsed) }} / 共 {{ formatBytes(memTotal) }} · 可用 {{ formatBytes(memAvailable) }}
           </div>
@@ -46,7 +46,7 @@
             <div class="cpu-core-bar">
               <div class="cpu-core-fill" :style="{ width: load.toFixed(1) + '%', background: getCoreColor(load) }"></div>
             </div>
-            <div class="cpu-core-value" :style="{ color: getCoreColor(load) }">{{ load.toFixed(1) }}%</div>
+            <div class="cpu-core-value" :style="{ color: getCoreColor(load) }"><AnimatedNumber :value="load" :decimals="1" suffix="%" /></div>
           </div>
         </div>
       </div>
@@ -104,7 +104,7 @@
               <span class="disk-bar">
                 <span class="disk-fill" :style="{ width: disk.usedPercent + '%', background: getDiskColor(disk.usedPercent) }"></span>
               </span>
-              <span class="disk-usage" :style="{ color: getDiskColor(disk.usedPercent) }">{{ disk.usedPercent.toFixed(1) }}%</span>
+              <span class="disk-usage" :style="{ color: getDiskColor(disk.usedPercent) }"><AnimatedNumber :value="disk.usedPercent" :decimals="1" suffix="%" /></span>
             </div>
             <div class="disk-detail">
               已用 {{ formatBytes(disk.used) }} / 共 {{ formatBytes(disk.size) }} · 剩余 {{ formatBytes(disk.available) }}
@@ -163,6 +163,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { Chart, registerables } from 'chart.js'
+import AnimatedNumber from '../components/AnimatedNumber.vue'
 
 Chart.register(...registerables)
 

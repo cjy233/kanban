@@ -318,7 +318,7 @@
     "id": 46,
     "category": "visual-upgrade",
     "description": "数据更新动效：数字变化使用 CSS transition",
-    "passes": false,
+    "passes": true,
     "verification": ["CPU/内存百分比变化时有过渡", "数字不是跳变而是平滑变化", "不影响数据准确性"]
   },
   {
