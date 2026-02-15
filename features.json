@@ -311,7 +311,7 @@
     "id": 45,
     "category": "visual-upgrade",
     "description": "页面切换动效：fade + slide 过渡动画",
-    "passes": false,
+    "passes": true,
     "verification": ["路由切换时有淡入淡出效果", "同时有轻微滑动", "动画时长 150ms", "不影响页面功能"]
   },
   {

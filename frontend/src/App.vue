@@ -15,7 +15,11 @@
       </div>
     </nav>
 
-    <router-view @connection-status="updateStatus" />
+    <router-view v-slot="{ Component }">
+      <transition name="page" mode="out-in">
+        <component :is="Component" @connection-status="updateStatus" />
+      </transition>
+    </router-view>
   </div>
 </template>
 
@@ -153,5 +157,20 @@ onUnmounted(() => {
 
 .theme-toggle:active {
   transform: scale(0.95);
+}
+
+/* 页面切换过渡动画 */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.page-leave-to {
+  opacity: 0;
 }
 </style>

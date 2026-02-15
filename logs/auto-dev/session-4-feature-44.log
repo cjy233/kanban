@@ -1,0 +1,8 @@
+Feature #44 完成。
+
+改动内容：
+- 添加 CSS 变量 `--color-table-stripe` 和 `--color-table-hover` 支持亮暗主题
+- 实现斑马纹：奇数行细微色差（亮色 2%，暗色 3%）
+- 实现 hover 高亮：主色调透明背景（亮色 8%，暗色 15%）
+- 修复 transition 位置（从 td 移到 tr）
+- 添加 `.no-stripe` 类处理空状态行
