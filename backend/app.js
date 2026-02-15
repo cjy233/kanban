@@ -71,6 +71,7 @@ app.get('/api/processes', async (req, res) => {
       .slice(0, 100)
       .map(p => ({
         pid: p.pid,
+        parentPid: p.parentPid,
         name: p.name,
         cpu: p.cpu,
         mem: p.mem,

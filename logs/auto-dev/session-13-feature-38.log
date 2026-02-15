@@ -1,0 +1,6 @@
+Feature #38 done. Changes:
+
+- `backend/server.js` — Added `si.networkStats()` to the WebSocket broadcast so network speed data is sent alongside CPU/memory every 3 seconds.
+- `frontend/src/views/Dashboard.vue` — Added a network traffic trend chart (Chart.js line chart) with two datasets: RX (purple) and TX (amber). Tracks total speed across all interfaces over time. Respects the existing time range selector, dark mode theme, and auto-updates via both WebSocket and polling fallback. Chart spans full width on desktop below the CPU/memory charts.
+
+Remaining features: #39 (Process tree view) and #40 (Keyboard shortcuts).

@@ -14,6 +14,7 @@
         <input type="checkbox" v-model="autoRefresh" />
         <span>自动刷新</span>
       </label>
+      <button class="btn btn-secondary" :class="{ active: treeView }" @click="treeView = !treeView">{{ treeView ? '列表视图' : '树视图' }}</button>
       <button class="btn btn-primary" @click="fetchProcesses">刷新</button>
       <button class="btn btn-secondary" @click="exportCSV">导出 CSV</button>
     </div>
@@ -30,7 +31,7 @@
             <th>用户</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="!treeView">
           <tr
             v-for="proc in filteredProcesses"
             :key="proc.pid"
@@ -55,6 +56,41 @@
           </tr>
           <tr v-if="!loading && !fetchError && search && filteredProcesses.length === 0">
             <td colspan="6" class="empty-state">未找到匹配的进程</td>
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <template v-for="node in processTree" :key="node.proc.pid">
+            <tr @click="showDetail(node.proc)" class="tree-row">
+              <td class="process-pid">{{ node.proc.pid }}</td>
+              <td class="process-name">
+                <span :style="{ paddingLeft: node.depth * 20 + 'px' }" class="tree-name">
+                  <span
+                    v-if="node.children.length > 0"
+                    class="tree-toggle"
+                    @click.stop="toggleExpand(node.proc.pid)"
+                  >{{ expandedPids.has(node.proc.pid) ? '▼' : '▶' }}</span>
+                  <span v-else class="tree-toggle tree-leaf">·</span>
+                  {{ node.proc.name }}
+                </span>
+              </td>
+              <td>
+                <span class="usage-bar">
+                  <span class="usage-fill cpu" :style="{ width: Math.min(node.proc.cpu, 100) + '%' }"></span>
+                </span>
+                {{ node.proc.cpu.toFixed(1) }}
+              </td>
+              <td>
+                <span class="usage-bar">
+                  <span class="usage-fill memory" :style="{ width: Math.min(node.proc.mem, 100) + '%' }"></span>
+                </span>
+                {{ node.proc.mem.toFixed(1) }} · {{ formatBytes(node.proc.memRss) }}
+              </td>
+              <td><span class="state-badge" :class="getStateClass(node.proc.state)">{{ getStateLabel(node.proc.state) }}</span></td>
+              <td>{{ node.proc.user }}</td>
+            </tr>
+          </template>
+          <tr v-if="!loading && !fetchError && processTree.length === 0">
+            <td colspan="6" class="empty-state">无进程数据</td>
           </tr>
         </tbody>
       </table>
@@ -154,6 +190,8 @@ const killing = ref(false)
 const showConfirm = ref(false)
 const toast = ref({ show: false, message: '', type: 'info' })
 const autoRefresh = ref(true)
+const treeView = ref(false)
+const expandedPids = ref(new Set())
 
 let pollInterval = null
 
@@ -180,6 +218,50 @@ const filteredProcesses = computed(() => {
 
   return result
 })
+
+const processTree = computed(() => {
+  const procs = filteredProcesses.value
+  const pidSet = new Set(procs.map(p => p.pid))
+  const childrenMap = new Map()
+  const roots = []
+
+  for (const p of procs) {
+    if (!childrenMap.has(p.pid)) childrenMap.set(p.pid, [])
+  }
+  for (const p of procs) {
+    if (p.parentPid && pidSet.has(p.parentPid) && p.parentPid !== p.pid) {
+      if (!childrenMap.has(p.parentPid)) childrenMap.set(p.parentPid, [])
+      childrenMap.get(p.parentPid).push(p)
+    } else {
+      roots.push(p)
+    }
+  }
+
+  const result = []
+  const flatten = (proc, depth) => {
+    const children = childrenMap.get(proc.pid) || []
+    result.push({ proc, depth, children })
+    if (children.length > 0 && expandedPids.value.has(proc.pid)) {
+      for (const child of children) {
+        flatten(child, depth + 1)
+      }
+    }
+  }
+  for (const root of roots) {
+    flatten(root, 0)
+  }
+  return result
+})
+
+const toggleExpand = (pid) => {
+  const s = new Set(expandedPids.value)
+  if (s.has(pid)) {
+    s.delete(pid)
+  } else {
+    s.add(pid)
+  }
+  expandedPids.value = s
+}
 
 const formatBytes = (bytes) => {
   if (!bytes) return '0 B'
@@ -384,6 +466,34 @@ onUnmounted(() => {
 
 .auto-refresh-toggle input[type="checkbox"] {
   cursor: pointer;
+}
+
+.btn.active {
+  background: var(--color-primary, #6366f1);
+  color: #fff;
+}
+
+.tree-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.tree-toggle {
+  display: inline-block;
+  width: 16px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--color-text-secondary, #64748b);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.tree-leaf {
+  cursor: default;
+  opacity: 0.4;
 }
 
 .modal-enter-active,
