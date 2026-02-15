@@ -34,17 +34,17 @@
 - Feature #42: 卡片组件升级 - COMPLETED
 - Feature #44: 表格组件升级 - COMPLETED
 
-### Session 2026-02-16 (Feature #44)
-- 为表格添加斑马纹样式：奇数行使用 --color-table-stripe 背景色
-- 实现行 hover 高亮：使用 --color-table-hover（主色调透明度）
-- 亮色主题：stripe 2% 黑色，hover 8% 蓝色
-- 暗色主题：stripe 3% 白色，hover 15% 蓝色（提高对比度）
-- 修复 transition 位置：从 td 移到 tr 元素
-- 添加 .no-stripe 类处理空状态行
+### Session 2026-02-16 (Feature #45)
+- 为 Vue Router 添加页面切换过渡动画
+- 使用 `<transition>` 组件包裹 `<router-view>`，配合 `v-slot` 和 `mode="out-in"`
+- 实现 fade（淡入淡出）+ slide（从右侧滑入 20px）效果
+- 动画时长 150ms（符合 features.json 规范）
+- 使用 Playwright 截图验证动画效果
+- Code review 发现时长问题（原 0.3s），已修复为 0.15s
 - 构建验证通过
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Start with Feature #45: 图表组件升级（渐变填充、tooltip 重设计）
+- Start with Feature #46: 图表组件升级（渐变填充、tooltip 重设计）
 - Reference design doc for visual specifications
