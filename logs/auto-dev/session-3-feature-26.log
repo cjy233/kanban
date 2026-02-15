@@ -1,1 +1,2 @@
 {"level":"warn","message":"[BashTool] Pre-flight check is taking longer than expected. Run with ANTHROPIC_LOG=debug to check for failed or slow API requests."}
+Feature #26 done. Added an auto-refresh checkbox toggle to the Processes page toolbar. When checked (default), the process list polls every 5 seconds. When unchecked, polling stops and only the manual "刷新" button refreshes the list. Build and smoke test both pass.

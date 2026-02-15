@@ -31,6 +31,20 @@
         </div>
       </div>
 
+      <!-- CPU 核心负载 -->
+      <div class="cpu-cores-section" v-if="cpuCores.length">
+        <h3 class="section-title">CPU 核心负载</h3>
+        <div class="cpu-cores-grid">
+          <div class="cpu-core-item" v-for="(load, index) in cpuCores" :key="index">
+            <div class="cpu-core-label">Core {{ index }}</div>
+            <div class="cpu-core-bar">
+              <div class="cpu-core-fill" :style="{ width: load.toFixed(1) + '%', background: getCoreColor(load) }"></div>
+            </div>
+            <div class="cpu-core-value" :style="{ color: getCoreColor(load) }">{{ load.toFixed(1) }}%</div>
+          </div>
+        </div>
+      </div>
+
       <div class="last-update" v-if="lastUpdateTime">
         最后更新: {{ lastUpdateAgo }}
       </div>
@@ -132,6 +146,7 @@ const uptimeSeconds = ref(0)
 const systemInfo = ref(null)
 const diskInfo = ref([])
 const networkInfo = ref([])
+const cpuCores = ref([])
 const lastUpdateTime = ref(null)
 const connectionStatus = ref('disconnected')
 const dataLoaded = ref(false)
@@ -145,6 +160,12 @@ const getDiskColor = (percent) => {
   if (percent > 90) return 'var(--color-danger)'
   if (percent >= 70) return 'var(--color-warning)'
   return 'var(--color-primary)'
+}
+
+const getCoreColor = (load) => {
+  if (load > 90) return 'var(--color-danger, #ef4444)'
+  if (load >= 70) return 'var(--color-warning, #f59e0b)'
+  return 'var(--color-primary, #2563eb)'
 }
 
 // Emit connection status changes to parent
@@ -274,6 +295,7 @@ const fetchStats = async () => {
     const data = await res.json()
 
     cpuUsage.value = data.cpu.usage
+    cpuCores.value = data.cpu.cores || []
     memUsage.value = data.memory.usedPercent
     memUsed.value = data.memory.used
     memTotal.value = data.memory.total
@@ -326,6 +348,7 @@ const connectWebSocket = () => {
     const data = JSON.parse(event.data)
     if (data.type === 'stats') {
       cpuUsage.value = data.cpu.usage
+      cpuCores.value = data.cpu.cores || []
       memUsage.value = data.memory.usedPercent
       lastUpdateTime.value = Date.now()
 
@@ -575,6 +598,59 @@ onUnmounted(() => {
 .network-total {
   font-size: 12px;
   color: var(--color-text-secondary, #64748b);
+}
+
+.cpu-cores-section {
+  margin-top: 24px;
+}
+
+.cpu-cores-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.cpu-core-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--color-bg-subtle, #f8fafc);
+  border-radius: 6px;
+}
+
+.cpu-core-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #64748b);
+  min-width: 56px;
+}
+
+.cpu-core-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--color-bg-muted, #e2e8f0);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cpu-core-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.cpu-core-value {
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 48px;
+  text-align: right;
+}
+
+@media (min-width: 768px) {
+  .cpu-cores-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width: 768px) {

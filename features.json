@@ -185,7 +185,7 @@
     "id": 27,
     "category": "enhancement",
     "description": "CPU per-core breakdown display",
-    "passes": false,
+    "passes": true,
     "verification": ["Dashboard shows per-core CPU bars", "Each core shows individual load percentage", "Updates in real-time"]
   },
   {
