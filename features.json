@@ -248,7 +248,7 @@
     "id": 36,
     "category": "enhancement",
     "description": "Process command-line search (not just name)",
-    "passes": false,
+    "passes": true,
     "verification": ["Search box searches both process name and command", "Typing a path matches command field", "Results include command-matched processes"]
   },
   {

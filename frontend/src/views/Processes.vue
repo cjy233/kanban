@@ -7,7 +7,7 @@
         v-model="search"
         type="text"
         class="search-input"
-        placeholder="搜索进程名称..."
+        placeholder="搜索进程名称或命令..."
       />
       <span class="process-count">共 {{ filteredProcesses.length }} 个进程</span>
       <label class="auto-refresh-toggle">
@@ -164,7 +164,8 @@ const filteredProcesses = computed(() => {
     const q = search.value.toLowerCase()
     result = result.filter(p =>
       p.name.toLowerCase().includes(q) ||
-      p.pid.toString().includes(q)
+      p.pid.toString().includes(q) ||
+      (p.command && p.command.toLowerCase().includes(q))
     )
   }
 

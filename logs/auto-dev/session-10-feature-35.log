@@ -1,0 +1,9 @@
+Feature #35 done. Here's what was implemented:
+
+Added a memory usage alert banner to `Dashboard.vue` that:
+- Appears when `memUsage > 90%` with a red warning banner showing the current percentage and used/total bytes
+- Has a dismiss button (✕) that hides the banner
+- Reappears automatically when memory drops below 90% and then exceeds it again (watcher resets the dismissed state)
+- Supports dark mode styling
+
+All 27 existing tests pass, build succeeds, smoke test passes. Next session should pick up feature #36.
