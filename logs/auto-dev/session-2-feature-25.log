@@ -1,0 +1,7 @@
+Feature #25 done. Changes:
+
+- `style.css` — added `[data-theme="dark"]` block with dark palette CSS variables and a `--color-chart-grid` variable
+- `App.vue` — added theme toggle button in nav, localStorage read/write, `data-theme` attribute on `<html>`
+- `Dashboard.vue` — chart grid color reads from CSS variable, MutationObserver updates charts when theme changes
+
+Build and smoke test both pass. Committed as `fae5caf`.

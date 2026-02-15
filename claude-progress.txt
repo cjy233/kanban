@@ -12,15 +12,15 @@
 - Toast notifications and confirm modal components
 - GitHub repo created at cjy233/kanban
 - Feature #23: Responsive layout works on mobile widths
+- Feature #25: Dark mode theme toggle
+- Feature #26: Auto-refresh toggle for process list
 
 ### Current State
 - All core features implemented and functional
 - Backend runs on port 7777, frontend uses Vite dev server with proxy
 - Responsive CSS added: mobile-first layout with 768px desktop breakpoint
-- Stats grid stacks vertically on mobile, 3-col on desktop
-- Charts stack vertically on mobile, 2-col on desktop
-- Process table scrolls horizontally on narrow screens (min-width: 600px)
-- Nav wraps gracefully at narrow widths
+- Dark mode: toggle button in nav, CSS variables for dark palette, Chart.js grid colors update, localStorage persistence
+- Auto-refresh toggle on Processes page: checkbox controls 5-second polling interval, manual refresh always available
 
 ### Known Issues
 - None currently tracked

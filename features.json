@@ -178,7 +178,7 @@
     "id": 26,
     "category": "enhancement",
     "description": "Auto-refresh toggle for process list",
-    "passes": false,
+    "passes": true,
     "verification": ["Processes page has auto-refresh toggle", "When enabled, list refreshes every 5 seconds", "When disabled, only manual refresh works"]
   },
   {

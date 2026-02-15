@@ -10,6 +10,10 @@
         placeholder="搜索进程名称..."
       />
       <span class="process-count">共 {{ filteredProcesses.length }} 个进程</span>
+      <label class="auto-refresh-toggle">
+        <input type="checkbox" v-model="autoRefresh" />
+        <span>自动刷新</span>
+      </label>
       <button class="btn btn-primary" @click="fetchProcesses">刷新</button>
     </div>
 
@@ -134,7 +138,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 import Toast from '../components/Toast.vue'
 
@@ -148,6 +152,7 @@ const selectedProc = ref(null)
 const killing = ref(false)
 const showConfirm = ref(false)
 const toast = ref({ show: false, message: '', type: 'info' })
+const autoRefresh = ref(true)
 
 let pollInterval = null
 
@@ -272,17 +277,36 @@ const handleKeydown = (e) => {
   }
 }
 
-onMounted(() => {
-  fetchProcesses()
+const startPolling = () => {
+  stopPolling()
   pollInterval = setInterval(fetchProcesses, 5000)
-  document.addEventListener('keydown', handleKeydown)
-})
+}
 
-onUnmounted(() => {
+const stopPolling = () => {
   if (pollInterval) {
     clearInterval(pollInterval)
     pollInterval = null
   }
+}
+
+watch(autoRefresh, (val) => {
+  if (val) {
+    startPolling()
+  } else {
+    stopPolling()
+  }
+})
+
+onMounted(() => {
+  fetchProcesses()
+  if (autoRefresh.value) {
+    startPolling()
+  }
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  stopPolling()
   document.removeEventListener('keydown', handleKeydown)
 })
 </script>
@@ -326,6 +350,20 @@ onUnmounted(() => {
 .state--zombie {
   background: rgba(239, 68, 68, 0.1);
   color: var(--color-danger, #ef4444);
+}
+
+.auto-refresh-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text-secondary, #64748b);
+  user-select: none;
+}
+
+.auto-refresh-toggle input[type="checkbox"] {
+  cursor: pointer;
 }
 
 .modal-enter-active,
