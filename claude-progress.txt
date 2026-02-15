@@ -24,6 +24,7 @@
 - Feature #37: Disk I/O read/write speed display
 - Feature #38: Network traffic trend chart
 - Feature #39: Process tree view showing parent-child relationships
+- Feature #40: Keyboard shortcuts for navigation
 
 ### Current State
 - All core features implemented and functional
@@ -47,10 +48,12 @@
 
 - Process tree view: Processes page has a "树视图" toggle button in toolbar. When active, processes are displayed as a tree hierarchy based on parentPid relationships. Parent processes show ▶/▼ expand/collapse toggles. Child processes are indented under their parents. Backend now includes parentPid in /api/processes response.
 
+- Keyboard shortcuts: Added global keydown listener in App.vue. Press 1 for dashboard, 2 for processes, / to focus search, R to refresh. Shortcuts are disabled when typing in input fields. Escape blurs focused inputs.
+
 ### Known Issues
 - None currently tracked
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick next feature from features.json (lowest ID with passes: false) — should be #40
+- All 40 features are now complete!
