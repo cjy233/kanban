@@ -179,11 +179,20 @@ body {
   background: var(--color-card);
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: var(--color-card-shadow);
+  /* 卡片 hover 过渡动画 */
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .stat-card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  /* 微上浮效果 + 阴影加深 */
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* 暗色主题下 hover 阴影更深 */
+[data-theme="dark"] .stat-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .stat-header {

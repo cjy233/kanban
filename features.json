@@ -290,7 +290,7 @@
     "id": 42,
     "category": "visual-upgrade",
     "description": "卡片组件升级：添加 hover 微上浮效果和阴影加深动画",
-    "passes": false,
+    "passes": true,
     "verification": ["鼠标悬停卡片时上浮 2px", "阴影随 hover 加深", "过渡动画流畅（150ms）", "亮暗主题都生效"]
   },
   {

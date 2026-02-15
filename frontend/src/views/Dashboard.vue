@@ -703,6 +703,14 @@ onUnmounted(() => {
   border-radius: 12px;
   padding: 12px;
   margin-top: 12px;
+  box-shadow: var(--color-card-shadow);
+  /* 卡片 hover 过渡动画 */
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.system-info-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .system-info {
@@ -745,6 +753,15 @@ onUnmounted(() => {
   border-radius: 12px;
   padding: 12px;
   margin-top: 12px;
+  box-shadow: var(--color-card-shadow);
+  /* 卡片 hover 过渡动画 */
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.disk-section:hover,
+.network-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .disk-list,
@@ -960,5 +977,12 @@ onUnmounted(() => {
   .chart-container--network {
     grid-column: 1 / -1;
   }
+}
+
+/* 暗色主题下 hover 阴影更深 */
+[data-theme="dark"] .system-info-section:hover,
+[data-theme="dark"] .disk-section:hover,
+[data-theme="dark"] .network-section:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 </style>
