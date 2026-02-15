@@ -1,0 +1,1 @@
+Feature #28 done. Added `kernel` to the backend OS response, added a kernel row to the Dashboard system info panel, and added the missing CSS styles for the info items. Build and smoke test both pass.

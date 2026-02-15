@@ -199,7 +199,7 @@
     "id": 29,
     "category": "enhancement",
     "description": "Export process list to CSV",
-    "passes": false,
+    "passes": true,
     "verification": ["Processes page has export button", "Click downloads CSV file", "CSV contains PID, name, CPU, memory, user columns"]
   },
   {

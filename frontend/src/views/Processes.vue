@@ -15,6 +15,7 @@
         <span>自动刷新</span>
       </label>
       <button class="btn btn-primary" @click="fetchProcesses">刷新</button>
+      <button class="btn btn-secondary" @click="exportCSV">导出 CSV</button>
     </div>
 
     <div class="process-table">
@@ -238,6 +239,24 @@ const showDetail = (proc) => {
 
 const closeDetail = () => {
   selectedProc.value = null
+}
+
+const exportCSV = () => {
+  const rows = filteredProcesses.value
+  const header = 'PID,Name,CPU,Memory,User'
+  const csvRows = rows.map(p => {
+    const name = p.name.includes(',') ? `"${p.name}"` : p.name
+    const user = (p.user || '').includes(',') ? `"${p.user}"` : (p.user || '')
+    return `${p.pid},${name},${p.cpu.toFixed(1)},${p.mem.toFixed(1)},${user}`
+  })
+  const csv = [header, ...csvRows].join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `processes-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
 }
 
 const confirmKill = () => {

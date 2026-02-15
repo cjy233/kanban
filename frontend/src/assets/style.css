@@ -132,6 +132,16 @@ body {
   background: var(--color-danger-dark);
 }
 
+.btn-secondary {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.btn-secondary:hover {
+  background: var(--color-text-secondary);
+  color: var(--color-card);
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--color-text-secondary);
