@@ -33,17 +33,21 @@
 - Feature #41: 升级全局配色系统 - COMPLETED
 - Feature #42: 卡片组件升级 - COMPLETED
 - Feature #44: 表格组件升级 - COMPLETED
+- Feature #47: 加载状态骨架屏 shimmer 效果 - COMPLETED
+- Feature #48: 图表样式升级 - COMPLETED
 
-### Session 2026-02-16 (Feature #47)
-- 创建 SkeletonLoader.vue 组件，支持 text/card/chart/table-row/circle 五种变体
-- 实现 shimmer 闪烁动画效果（CSS keyframes + background-position 动画）
-- 在 Dashboard.vue 中集成骨架屏，使用单个 Transition 实现平滑过渡
-- 在 Processes.vue 中集成表格骨架屏（首次加载时显示）
-- Code review 后修复：重构 Transition 结构、删除无效的暗色主题 CSS 规则
+### Session 2026-02-16 (Feature #48)
+- 新增 createGradient 函数创建垂直渐变填充
+- 新增 getChartColors 函数根据亮/暗主题返回适配的颜色配置
+- 新增 getTooltipConfig 函数配置精致的 tooltip 样式（圆角、内边距、主题适配）
+- 修改 initCharts 使用渐变填充和新 tooltip 配置
+- 修改 updateChartTheme 在主题切换时更新渐变和颜色
+- 增强 hover 状态：pointHoverRadius、pointHoverBackgroundColor、pointHoverBorderColor
+- Code review 后修复：tooltip callback 添加 null 安全检查
 - 构建验证通过
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Start with Feature #48: 后端 API：读取 Claude Code 配置
-- Reference design doc for visual specifications
+- Start with Feature #49: 后端 API：GET /api/claude-config 获取合并配置
+- Reference design doc for API specifications
