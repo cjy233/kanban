@@ -16,6 +16,7 @@
 - Feature #26: Auto-refresh toggle for process list
 - Feature #27: CPU per-core breakdown display
 - Feature #28: System info panel (OS, hostname, kernel)
+- Feature #29: Export process list to CSV
 
 ### Current State
 - All core features implemented and functional
@@ -25,6 +26,7 @@
 - Auto-refresh toggle on Processes page: checkbox controls 5-second polling interval, manual refresh always available
 - CPU per-core breakdown: Dashboard shows individual core bars with color-coded load levels, updates via both REST and WebSocket
 - System info panel: Dashboard shows OS distro, hostname, platform, and kernel version; data loaded once from /api/stats; styled with monospace font
+- Export CSV: Processes page has "导出 CSV" button in toolbar; exports filtered process list as CSV with PID, Name, CPU, Memory, User columns
 
 ### Known Issues
 - None currently tracked
@@ -32,4 +34,4 @@
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick next feature from features.json (lowest ID with passes: false) — should be #29
+- Pick next feature from features.json (lowest ID with passes: false) — should be #30
