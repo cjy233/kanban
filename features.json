@@ -241,7 +241,7 @@
     "id": 35,
     "category": "enhancement",
     "description": "Memory usage alert threshold notification",
-    "passes": false,
+    "passes": true,
     "verification": ["When memory exceeds 90%, warning banner appears on dashboard", "Banner shows current usage", "Dismissible but reappears if still high"]
   },
   {

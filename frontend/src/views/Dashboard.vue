@@ -2,6 +2,12 @@
   <div class="dashboard">
     <h1 class="page-title">系统概览</h1>
 
+    <div v-if="memAlertVisible" class="mem-alert-banner">
+      <span class="mem-alert-icon">⚠</span>
+      <span class="mem-alert-text">内存使用率过高: {{ memUsage.toFixed(1) }}% — 已用 {{ formatBytes(memUsed) }} / 共 {{ formatBytes(memTotal) }}</span>
+      <button class="mem-alert-dismiss" @click="dismissMemAlert">✕</button>
+    </div>
+
     <template v-if="dataLoaded">
       <div class="stats-grid">
         <div class="stat-card stat-card--cpu">
@@ -164,6 +170,15 @@ const cpuCores = ref([])
 const lastUpdateTime = ref(null)
 const connectionStatus = ref('disconnected')
 const dataLoaded = ref(false)
+const memAlertDismissed = ref(false)
+
+const memAlertVisible = computed(() => {
+  return memUsage.value > 90 && !memAlertDismissed.value
+})
+
+const dismissMemAlert = () => {
+  memAlertDismissed.value = true
+}
 
 const uptimeDays = computed(() => {
   if (!uptimeSeconds.value) return 0
@@ -185,6 +200,13 @@ const getCoreColor = (load) => {
 // Emit connection status changes to parent
 watch(connectionStatus, (status) => {
   emit('connection-status', status)
+})
+
+// Reset memory alert dismissed state when memory drops below threshold
+watch(memUsage, (val, oldVal) => {
+  if (oldVal > 90 && val <= 90) {
+    memAlertDismissed.value = false
+  }
 })
 
 const cpuChartRef = ref(null)
@@ -473,6 +495,51 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.mem-alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  color: #991b1b;
+  font-size: 14px;
+}
+
+[data-theme="dark"] .mem-alert-banner {
+  background: #451a1a;
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+
+.mem-alert-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.mem-alert-text {
+  flex: 1;
+  font-weight: 500;
+}
+
+.mem-alert-dismiss {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.mem-alert-dismiss:hover {
+  opacity: 1;
+}
+
 .last-update {
   text-align: right;
   color: var(--color-text-secondary, #64748b);

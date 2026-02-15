@@ -1,0 +1,1 @@
+Feature #32 done. Added 27 frontend component tests across 4 test files (Toast, ConfirmModal, Dashboard, Processes) using vitest + @vue/test-utils + jsdom. All tests pass, build succeeds, init.sh smoke test passes.
