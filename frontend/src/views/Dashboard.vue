@@ -366,17 +366,99 @@ const getTotalNetSpeed = (networkData) => {
   }, { rx: 0, tx: 0 })
 }
 
+// 创建垂直渐变填充
+const createGradient = (ctx, colorStart, colorEnd) => {
+  const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height)
+  gradient.addColorStop(0, colorStart)
+  gradient.addColorStop(1, colorEnd)
+  return gradient
+}
+
+// 获取当前主题的图表颜色
+const getChartColors = () => {
+  const isDark = document.documentElement.classList.contains('dark')
+  return {
+    cpu: {
+      border: isDark ? '#3b82f6' : '#2563eb',
+      gradientStart: isDark ? 'rgba(59, 130, 246, 0.4)' : 'rgba(37, 99, 235, 0.3)',
+      gradientEnd: isDark ? 'rgba(59, 130, 246, 0.02)' : 'rgba(37, 99, 235, 0.02)'
+    },
+    memory: {
+      border: isDark ? '#34d399' : '#10b981',
+      gradientStart: isDark ? 'rgba(52, 211, 153, 0.4)' : 'rgba(16, 185, 129, 0.3)',
+      gradientEnd: isDark ? 'rgba(52, 211, 153, 0.02)' : 'rgba(16, 185, 129, 0.02)'
+    },
+    netRx: {
+      border: isDark ? '#a78bfa' : '#8b5cf6',
+      gradientStart: isDark ? 'rgba(167, 139, 250, 0.4)' : 'rgba(139, 92, 246, 0.3)',
+      gradientEnd: isDark ? 'rgba(167, 139, 250, 0.02)' : 'rgba(139, 92, 246, 0.02)'
+    },
+    netTx: {
+      border: isDark ? '#fbbf24' : '#f59e0b',
+      gradientStart: isDark ? 'rgba(251, 191, 36, 0.4)' : 'rgba(245, 158, 11, 0.3)',
+      gradientEnd: isDark ? 'rgba(251, 191, 36, 0.02)' : 'rgba(245, 158, 11, 0.02)'
+    },
+    tooltip: {
+      bg: isDark ? 'rgba(22, 27, 34, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+      border: isDark ? '#30363d' : '#e5e7eb',
+      text: isDark ? '#e6edf3' : '#1a1a2e',
+      textSecondary: isDark ? '#8b949e' : '#6b7280'
+    }
+  }
+}
+
+// 自定义 tooltip 配置
+const getTooltipConfig = (colors, valueFormatter = (v) => v.toFixed(1) + '%') => ({
+  enabled: true,
+  backgroundColor: colors.tooltip.bg,
+  borderColor: colors.tooltip.border,
+  borderWidth: 1,
+  cornerRadius: 8,
+  padding: 12,
+  titleColor: colors.tooltip.textSecondary,
+  titleFont: { size: 11, weight: 'normal' },
+  bodyColor: colors.tooltip.text,
+  bodyFont: { size: 14, weight: '600' },
+  displayColors: false,
+  callbacks: {
+    title: () => '',
+    label: (ctx) => ctx.parsed?.y != null ? valueFormatter(ctx.parsed.y) : ''
+  }
+})
+
 const initCharts = () => {
   const gridColor = getChartGridColor()
+  const colors = getChartColors()
+
+  // CPU 图表渐变
+  const cpuCtx = cpuChartRef.value.getContext('2d')
+  const cpuGradient = createGradient(cpuCtx, colors.cpu.gradientStart, colors.cpu.gradientEnd)
+
+  // 内存图表渐变
+  const memCtx = memChartRef.value.getContext('2d')
+  const memGradient = createGradient(memCtx, colors.memory.gradientStart, colors.memory.gradientEnd)
+
+  // 网络图表渐变
+  const netCtx = netChartRef.value.getContext('2d')
+  const netRxGradient = createGradient(netCtx, colors.netRx.gradientStart, colors.netRx.gradientEnd)
+  const netTxGradient = createGradient(netCtx, colors.netTx.gradientStart, colors.netTx.gradientEnd)
+
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
     animation: { duration: 0 },
+    interaction: {
+      intersect: false,
+      mode: 'index'
+    },
     scales: {
       y: { min: 0, max: 100, grid: { color: gridColor } },
       x: { display: false }
     },
-    plugins: { legend: { display: false } }
+    plugins: {
+      legend: { display: false },
+      tooltip: getTooltipConfig(colors)
+    }
   }
 
   cpuChart = new Chart(cpuChartRef.value, {
@@ -385,11 +467,16 @@ const initCharts = () => {
       labels: Array(chartRange.value.points).fill(''),
       datasets: [{
         data: cpuHistory,
-        borderColor: '#2563eb',
-        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        borderColor: colors.cpu.border,
+        backgroundColor: cpuGradient,
+        borderWidth: 2,
         fill: true,
-        tension: 0.3,
-        pointRadius: 0
+        tension: 0.4,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: colors.cpu.border,
+        pointHoverBorderColor: '#fff',
+        pointHoverBorderWidth: 2
       }]
     },
     options: commonOptions
@@ -401,11 +488,16 @@ const initCharts = () => {
       labels: Array(chartRange.value.points).fill(''),
       datasets: [{
         data: memHistory,
-        borderColor: '#10b981',
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        borderColor: colors.memory.border,
+        backgroundColor: memGradient,
+        borderWidth: 2,
         fill: true,
-        tension: 0.3,
-        pointRadius: 0
+        tension: 0.4,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: colors.memory.border,
+        pointHoverBorderColor: '#fff',
+        pointHoverBorderWidth: 2
       }]
     },
     options: commonOptions
@@ -419,20 +511,30 @@ const initCharts = () => {
         {
           label: 'RX (下载)',
           data: netRxHistory,
-          borderColor: '#8b5cf6',
-          backgroundColor: 'rgba(139, 92, 246, 0.1)',
+          borderColor: colors.netRx.border,
+          backgroundColor: netRxGradient,
+          borderWidth: 2,
           fill: true,
-          tension: 0.3,
-          pointRadius: 0
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          pointHoverBackgroundColor: colors.netRx.border,
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 2
         },
         {
           label: 'TX (上传)',
           data: netTxHistory,
-          borderColor: '#f59e0b',
-          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          borderColor: colors.netTx.border,
+          backgroundColor: netTxGradient,
+          borderWidth: 2,
           fill: true,
-          tension: 0.3,
-          pointRadius: 0
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          pointHoverBackgroundColor: colors.netTx.border,
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 2
         }
       ]
     },
@@ -440,6 +542,10 @@ const initCharts = () => {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 0 },
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      },
       scales: {
         y: {
           min: 0,
@@ -451,7 +557,8 @@ const initCharts = () => {
         x: { display: false }
       },
       plugins: {
-        legend: { display: true, position: 'top', labels: { boxWidth: 12, padding: 8 } }
+        legend: { display: true, position: 'top', labels: { boxWidth: 12, padding: 8 } },
+        tooltip: getTooltipConfig(colors, (v) => formatSpeed(v) + '/s')
       }
     }
   })
@@ -459,16 +566,40 @@ const initCharts = () => {
 
 const updateChartTheme = () => {
   const gridColor = getChartGridColor()
+  const colors = getChartColors()
+
   if (cpuChart) {
+    const cpuCtx = cpuChartRef.value.getContext('2d')
+    const cpuGradient = createGradient(cpuCtx, colors.cpu.gradientStart, colors.cpu.gradientEnd)
+    cpuChart.data.datasets[0].borderColor = colors.cpu.border
+    cpuChart.data.datasets[0].backgroundColor = cpuGradient
+    cpuChart.data.datasets[0].pointHoverBackgroundColor = colors.cpu.border
     cpuChart.options.scales.y.grid.color = gridColor
+    cpuChart.options.plugins.tooltip = getTooltipConfig(colors)
     cpuChart.update('none')
   }
   if (memChart) {
+    const memCtx = memChartRef.value.getContext('2d')
+    const memGradient = createGradient(memCtx, colors.memory.gradientStart, colors.memory.gradientEnd)
+    memChart.data.datasets[0].borderColor = colors.memory.border
+    memChart.data.datasets[0].backgroundColor = memGradient
+    memChart.data.datasets[0].pointHoverBackgroundColor = colors.memory.border
     memChart.options.scales.y.grid.color = gridColor
+    memChart.options.plugins.tooltip = getTooltipConfig(colors)
     memChart.update('none')
   }
   if (netChart) {
+    const netCtx = netChartRef.value.getContext('2d')
+    const netRxGradient = createGradient(netCtx, colors.netRx.gradientStart, colors.netRx.gradientEnd)
+    const netTxGradient = createGradient(netCtx, colors.netTx.gradientStart, colors.netTx.gradientEnd)
+    netChart.data.datasets[0].borderColor = colors.netRx.border
+    netChart.data.datasets[0].backgroundColor = netRxGradient
+    netChart.data.datasets[0].pointHoverBackgroundColor = colors.netRx.border
+    netChart.data.datasets[1].borderColor = colors.netTx.border
+    netChart.data.datasets[1].backgroundColor = netTxGradient
+    netChart.data.datasets[1].pointHoverBackgroundColor = colors.netTx.border
     netChart.options.scales.y.grid.color = gridColor
+    netChart.options.plugins.tooltip = getTooltipConfig(colors, (v) => formatSpeed(v) + '/s')
     netChart.update('none')
   }
 }

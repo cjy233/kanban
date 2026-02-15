@@ -1,0 +1,4 @@
+Feature #47 完成。实现了骨架屏 shimmer 效果：
+- 创建 SkeletonLoader.vue 组件，支持 5 种变体和 CSS 渐变动画
+- Dashboard.vue 和 Processes.vue 集成骨架屏，数据加载时显示闪烁动画
+- 使用 Vue Transition 实现加载完成后的平滑过渡

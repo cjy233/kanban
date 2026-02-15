@@ -332,7 +332,7 @@
     "id": 48,
     "category": "visual-upgrade",
     "description": "图表样式升级：渐变填充和 tooltip 重新设计",
-    "passes": false,
+    "passes": true,
     "verification": ["CPU/内存图表有渐变填充", "tooltip 样式更精致", "暗色主题下图表颜色协调"]
   },
   {
