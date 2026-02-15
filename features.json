@@ -262,7 +262,7 @@
     "id": 38,
     "category": "enhancement",
     "description": "Network traffic trend chart",
-    "passes": false,
+    "passes": true,
     "verification": ["Dashboard has network traffic chart", "Shows RX/TX over time", "Updates in real-time like CPU/memory charts"]
   },
   {

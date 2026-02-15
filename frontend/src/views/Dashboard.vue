@@ -79,6 +79,13 @@
             <canvas ref="memChartRef"></canvas>
           </div>
         </div>
+
+        <div class="chart-container chart-container--network">
+          <h3 class="chart-title">网络流量趋势</h3>
+          <div class="chart-wrapper">
+            <canvas ref="netChartRef"></canvas>
+          </div>
+        </div>
       </div>
 
       <!-- 磁盘使用 -->
@@ -217,8 +224,10 @@ watch(memUsage, (val, oldVal) => {
 
 const cpuChartRef = ref(null)
 const memChartRef = ref(null)
+const netChartRef = ref(null)
 let cpuChart = null
 let memChart = null
+let netChart = null
 let ws = null
 let pollInterval = null
 let reconnectAttempts = 0
@@ -236,6 +245,8 @@ const chartRangeOptions = [
 const chartRange = ref(chartRangeOptions[0])
 let cpuHistory = Array(chartRange.value.points).fill(0)
 let memHistory = Array(chartRange.value.points).fill(0)
+let netRxHistory = Array(chartRange.value.points).fill(0)
+let netTxHistory = Array(chartRange.value.points).fill(0)
 
 const setChartRange = (option) => {
   const oldLen = cpuHistory.length
@@ -244,9 +255,13 @@ const setChartRange = (option) => {
   if (newLen > oldLen) {
     cpuHistory = Array(newLen - oldLen).fill(0).concat(cpuHistory)
     memHistory = Array(newLen - oldLen).fill(0).concat(memHistory)
+    netRxHistory = Array(newLen - oldLen).fill(0).concat(netRxHistory)
+    netTxHistory = Array(newLen - oldLen).fill(0).concat(netTxHistory)
   } else {
     cpuHistory = cpuHistory.slice(oldLen - newLen)
     memHistory = memHistory.slice(oldLen - newLen)
+    netRxHistory = netRxHistory.slice(oldLen - newLen)
+    netTxHistory = netTxHistory.slice(oldLen - newLen)
   }
   if (cpuChart && memChart) {
     const labels = Array(newLen).fill('')
@@ -256,6 +271,13 @@ const setChartRange = (option) => {
     memChart.data.datasets[0].data = memHistory
     cpuChart.update('none')
     memChart.update('none')
+  }
+  if (netChart) {
+    const labels = Array(newLen).fill('')
+    netChart.data.labels = labels
+    netChart.data.datasets[0].data = netRxHistory
+    netChart.data.datasets[1].data = netTxHistory
+    netChart.update('none')
   }
 }
 
@@ -291,6 +313,15 @@ const formatUptime = (seconds) => {
 
 const getChartGridColor = () => {
   return getComputedStyle(document.documentElement).getPropertyValue('--color-chart-grid').trim() || '#f1f5f9'
+}
+
+const getTotalNetSpeed = (networkData) => {
+  if (!networkData || !networkData.length) return { rx: 0, tx: 0 }
+  return networkData.reduce((acc, n) => {
+    acc.rx += (n.rxSec || 0)
+    acc.tx += (n.txSec || 0)
+    return acc
+  }, { rx: 0, tx: 0 })
 }
 
 const initCharts = () => {
@@ -337,6 +368,51 @@ const initCharts = () => {
     },
     options: commonOptions
   })
+
+  netChart = new Chart(netChartRef.value, {
+    type: 'line',
+    data: {
+      labels: Array(chartRange.value.points).fill(''),
+      datasets: [
+        {
+          label: 'RX (下载)',
+          data: netRxHistory,
+          borderColor: '#8b5cf6',
+          backgroundColor: 'rgba(139, 92, 246, 0.1)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0
+        },
+        {
+          label: 'TX (上传)',
+          data: netTxHistory,
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 0 },
+      scales: {
+        y: {
+          min: 0,
+          grid: { color: gridColor },
+          ticks: {
+            callback: (v) => formatSpeed(v) + '/s'
+          }
+        },
+        x: { display: false }
+      },
+      plugins: {
+        legend: { display: true, position: 'top', labels: { boxWidth: 12, padding: 8 } }
+      }
+    }
+  })
 }
 
 const updateChartTheme = () => {
@@ -349,6 +425,10 @@ const updateChartTheme = () => {
     memChart.options.scales.y.grid.color = gridColor
     memChart.update('none')
   }
+  if (netChart) {
+    netChart.options.scales.y.grid.color = gridColor
+    netChart.update('none')
+  }
 }
 
 const updateCharts = () => {
@@ -357,6 +437,9 @@ const updateCharts = () => {
   }
   if (memChart) {
     memChart.update('none')
+  }
+  if (netChart) {
+    netChart.update('none')
   }
 }
 
@@ -384,6 +467,11 @@ const fetchStats = async () => {
     cpuHistory.shift()
     memHistory.push(data.memory.usedPercent)
     memHistory.shift()
+    const netSpeed = getTotalNetSpeed(data.network)
+    netRxHistory.push(netSpeed.rx)
+    netRxHistory.shift()
+    netTxHistory.push(netSpeed.tx)
+    netTxHistory.shift()
     updateCharts()
   } catch (e) {
     console.error('Failed to fetch stats:', e)
@@ -428,6 +516,11 @@ const connectWebSocket = () => {
       cpuHistory.shift()
       memHistory.push(data.memory.usedPercent)
       memHistory.shift()
+      const netSpeed = getTotalNetSpeed(data.network || [])
+      netRxHistory.push(netSpeed.rx)
+      netRxHistory.shift()
+      netTxHistory.push(netSpeed.tx)
+      netTxHistory.shift()
 
       updateCharts()
     }
@@ -497,6 +590,10 @@ onUnmounted(() => {
   if (memChart) {
     memChart.destroy()
     memChart = null
+  }
+  if (netChart) {
+    netChart.destroy()
+    netChart = null
   }
 })
 </script>
@@ -859,6 +956,9 @@ onUnmounted(() => {
 @media (min-width: 768px) {
   .charts-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .chart-container--network {
+    grid-column: 1 / -1;
   }
 }
 </style>

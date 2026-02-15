@@ -1,0 +1,1 @@
+Feature #37 done. Added `si.fsStats()` to the backend API and a disk I/O summary row in the Dashboard's storage section showing read/write speeds in human-readable format (e.g., "128.00 KB/s"). Build and smoke test both pass.

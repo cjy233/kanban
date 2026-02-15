@@ -20,7 +20,7 @@ wss.on('connection', (ws) => {
 setInterval(async () => {
   if (wsClients.size === 0) return;
   try {
-    const [cpu, mem] = await Promise.all([si.currentLoad(), si.mem()]);
+    const [cpu, mem, network] = await Promise.all([si.currentLoad(), si.mem(), si.networkStats()]);
     const data = JSON.stringify({
       type: 'stats',
       timestamp: Date.now(),
@@ -30,7 +30,12 @@ setInterval(async () => {
         used: mem.used,
         available: mem.available,
         usedPercent: ((mem.total - mem.available) / mem.total) * 100
-      }
+      },
+      network: network.map(n => ({
+        iface: n.iface,
+        rxSec: n.rx_sec,
+        txSec: n.tx_sec
+      }))
     });
     wsClients.forEach(ws => {
       if (ws.readyState === 1) ws.send(data);
