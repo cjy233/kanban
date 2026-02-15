@@ -276,7 +276,7 @@
     "id": 40,
     "category": "enhancement",
     "description": "Keyboard shortcuts for navigation",
-    "passes": false,
+    "passes": true,
     "verification": ["Press 1 to go to dashboard", "Press 2 to go to processes", "Press / to focus search", "Press R to refresh"]
   }
 ]

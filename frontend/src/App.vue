@@ -20,10 +20,44 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const connectionStatus = ref('disconnected')
 const isDark = ref(false)
+
+const handleKeydown = (e) => {
+  const tag = e.target.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.target.isContentEditable) {
+    if (e.key === 'Escape') {
+      e.target.blur()
+    }
+    return
+  }
+  if (e.ctrlKey || e.metaKey || e.altKey) return
+
+  switch (e.key) {
+    case '1':
+      router.push('/')
+      break
+    case '2':
+      router.push('/processes')
+      break
+    case '/': {
+      e.preventDefault()
+      const searchInput = document.querySelector('.search-input')
+      if (searchInput) searchInput.focus()
+      break
+    }
+    case 'r':
+    case 'R': {
+      const refreshBtn = document.querySelector('.btn-primary')
+      if (refreshBtn) refreshBtn.click()
+      break
+    }
+  }
+}
 
 const statusTitle = computed(() => {
   const titles = {
@@ -53,6 +87,11 @@ onMounted(() => {
   const saved = localStorage.getItem('theme')
   isDark.value = saved === 'dark'
   applyTheme(isDark.value)
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
 })
 </script>
 

@@ -1,0 +1,11 @@
+Feature #39 is done. Here's what was implemented:
+
+- **Backend**: Added `parentPid` field to `/api/processes` response in `app.js`
+- **Frontend** (`Processes.vue`):
+  - Added "树视图/列表视图" toggle button in the toolbar
+  - Built a `processTree` computed that constructs parent-child hierarchy from the flat process list using `parentPid`
+  - Added `expandedPids` reactive set with `toggleExpand()` for collapsible nodes
+  - Tree rows show ▶/▼ arrows for parents with children, indented by depth level
+  - List view remains the default and works exactly as before
+
+Build passes, init.sh smoke test passes, feature marked as `true` in features.json. Remaining: feature #40 (Keyboard shortcuts).
