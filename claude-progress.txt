@@ -14,6 +14,7 @@
 - Feature #23: Responsive layout works on mobile widths
 - Feature #25: Dark mode theme toggle
 - Feature #26: Auto-refresh toggle for process list
+- Feature #27: CPU per-core breakdown display
 
 ### Current State
 - All core features implemented and functional
@@ -21,6 +22,7 @@
 - Responsive CSS added: mobile-first layout with 768px desktop breakpoint
 - Dark mode: toggle button in nav, CSS variables for dark palette, Chart.js grid colors update, localStorage persistence
 - Auto-refresh toggle on Processes page: checkbox controls 5-second polling interval, manual refresh always available
+- CPU per-core breakdown: Dashboard shows individual core bars with color-coded load levels, updates via both REST and WebSocket
 
 ### Known Issues
 - None currently tracked
@@ -28,4 +30,4 @@
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick next feature from features.json (lowest ID with passes: false)
+- Pick next feature from features.json (lowest ID with passes: false) — should be #28
