@@ -21,6 +21,7 @@
 - Feature #31: Backend API unit tests with vitest
 - Feature #32: Frontend component tests with vitest
 - Feature #36: Process command-line search (not just name)
+- Feature #37: Disk I/O read/write speed display
 
 ### Current State
 - All core features implemented and functional
@@ -38,10 +39,12 @@
 
 - Process command-line search: Extended filteredProcesses computed in Processes.vue to also match against p.command (in addition to p.name and p.pid). Updated search placeholder to "搜索进程名称或命令...". Backend already returned command field, so no backend changes needed.
 
+- Disk I/O read/write speed: Added si.fsStats() to backend /api/stats endpoint, returning rxSec/wxSec (bytes/sec). Dashboard shows disk I/O summary line above filesystem list with read/write speeds in human-readable format. Uses existing formatSpeed() helper. Values are null on first API call (fsStats needs two calls to compute delta), so the UI conditionally hides the I/O line until real values are available.
+
 ### Known Issues
 - None currently tracked
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick next feature from features.json (lowest ID with passes: false) — should be #37
+- Pick next feature from features.json (lowest ID with passes: false) — should be #38
