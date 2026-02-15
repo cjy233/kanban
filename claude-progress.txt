@@ -22,6 +22,7 @@
 - Feature #32: Frontend component tests with vitest
 - Feature #36: Process command-line search (not just name)
 - Feature #37: Disk I/O read/write speed display
+- Feature #38: Network traffic trend chart
 
 ### Current State
 - All core features implemented and functional
@@ -41,10 +42,12 @@
 
 - Disk I/O read/write speed: Added si.fsStats() to backend /api/stats endpoint, returning rxSec/wxSec (bytes/sec). Dashboard shows disk I/O summary line above filesystem list with read/write speeds in human-readable format. Uses existing formatSpeed() helper. Values are null on first API call (fsStats needs two calls to compute delta), so the UI conditionally hides the I/O line until real values are available.
 
+- Network traffic trend chart: Added Chart.js line chart to Dashboard showing total RX (download) and TX (upload) speeds over time. Purple line for RX, amber for TX. Added si.networkStats() to WebSocket broadcast so chart updates in real-time. Chart respects time range selector and dark mode theme. Spans full width below CPU/memory charts on desktop.
+
 ### Known Issues
 - None currently tracked
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick next feature from features.json (lowest ID with passes: false) — should be #38
+- Pick next feature from features.json (lowest ID with passes: false) — should be #39
