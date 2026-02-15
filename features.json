@@ -157,7 +157,7 @@
     "id": 23,
     "category": "ui",
     "description": "Responsive layout works on mobile widths",
-    "passes": false,
+    "passes": true,
     "verification": ["Resize browser to 375px width", "Stats grid stacks vertically", "Charts stack vertically", "Process table scrolls horizontally", "Nav remains usable"]
   },
   {

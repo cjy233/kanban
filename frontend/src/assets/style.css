@@ -244,6 +244,7 @@ body {
 
 .process-table table {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
 }
 
@@ -465,5 +466,65 @@ body {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Responsive: desktop breakpoint */
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .charts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .system-info {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .toolbar {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .toolbar .btn {
+    width: auto;
+  }
+
+  .search-input {
+    width: 300px;
+  }
+
+  .status-text {
+    display: inline;
+  }
+
+  .modal {
+    max-width: 560px;
+  }
+
+  .detail-row {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .detail-label {
+    width: 100px;
+  }
+}
+
+/* Nav: ensure usable at narrow widths */
+.nav {
+  flex-wrap: wrap;
+  min-height: 50px;
+  height: auto;
+  gap: 4px;
+}
+
+.nav-brand {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
