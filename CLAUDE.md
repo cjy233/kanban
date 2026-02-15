@@ -103,3 +103,23 @@ Every session MUST begin with these steps, in order:
 - What you changed
 - Any issues encountered
 - What the next session should pick up
+
+### Debugging Strategy (7-Level Escalation)
+
+When encountering issues, escalate through levels (max 2 retries per level):
+
+1. **L1 日志分析** — Read error logs, stack traces, locate root cause
+2. **L2 构建/测试修复** — Fix compile errors, test failures, re-run
+3. **L3 浏览器验证** — Use MCP browser to check UI, take screenshots, compare with design
+4. **L4 API 测试** — curl/fetch endpoints, verify request/response/data flow
+5. **L5 MCP 工具** — Use all available MCP servers (DB queries, external services, monitoring)
+6. **L6 降级/跳过** — Simplify non-critical features, record reason
+7. **L7 阻塞求助** — Create BLOCKED.md with steps for user, exit session
+
+### Blocking Protocol
+
+When agent cannot proceed independently (external DB, API keys, permissions, design assets):
+1. Create `BLOCKED.md` in project root with: problem description, exact steps for user, what happens after
+2. Update `claude-progress.txt` with blocked status
+3. Exit session normally (do NOT mark feature as passed)
+4. The auto-dev.sh script will detect BLOCKED.md, show it to user, and wait for confirmation

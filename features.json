@@ -278,5 +278,131 @@
     "description": "Keyboard shortcuts for navigation",
     "passes": true,
     "verification": ["Press 1 to go to dashboard", "Press 2 to go to processes", "Press / to focus search", "Press R to refresh"]
+  },
+  {
+    "id": 41,
+    "category": "visual-upgrade",
+    "description": "升级全局配色系统：亮色主题使用 #fafbfc 背景、#0d1117 暗色背景，优化 CSS 变量",
+    "passes": false,
+    "verification": ["style.css 包含新的 CSS 变量定义", "亮色主题背景为微灰白", "暗色主题背景为 GitHub 风格深黑", "所有组件正确引用变量"]
+  },
+  {
+    "id": 42,
+    "category": "visual-upgrade",
+    "description": "卡片组件升级：添加 hover 微上浮效果和阴影加深动画",
+    "passes": false,
+    "verification": ["鼠标悬停卡片时上浮 2px", "阴影随 hover 加深", "过渡动画流畅（150ms）", "亮暗主题都生效"]
+  },
+  {
+    "id": 43,
+    "category": "visual-upgrade",
+    "description": "按钮组件升级：添加 active 按压反馈和 loading 状态",
+    "passes": false,
+    "verification": ["按钮点击时有按压缩放效果", "loading 状态显示旋转图标", "禁用状态样式正确", "所有按钮风格统一"]
+  },
+  {
+    "id": 44,
+    "category": "visual-upgrade",
+    "description": "表格组件升级：行 hover 高亮和斑马纹样式",
+    "passes": false,
+    "verification": ["表格行 hover 时背景变色", "奇偶行有细微色差", "暗色主题下对比度合适", "进程列表表格应用新样式"]
+  },
+  {
+    "id": 45,
+    "category": "visual-upgrade",
+    "description": "页面切换动效：fade + slide 过渡动画",
+    "passes": false,
+    "verification": ["路由切换时有淡入淡出效果", "同时有轻微滑动", "动画时长 150ms", "不影响页面功能"]
+  },
+  {
+    "id": 46,
+    "category": "visual-upgrade",
+    "description": "数据更新动效：数字变化使用 CSS transition",
+    "passes": false,
+    "verification": ["CPU/内存百分比变化时有过渡", "数字不是跳变而是平滑变化", "不影响数据准确性"]
+  },
+  {
+    "id": 47,
+    "category": "visual-upgrade",
+    "description": "加载状态：骨架屏 shimmer 效果",
+    "passes": false,
+    "verification": ["数据加载时显示骨架屏", "骨架屏有闪烁动画", "加载完成后平滑切换到真实内容"]
+  },
+  {
+    "id": 48,
+    "category": "visual-upgrade",
+    "description": "图表样式升级：渐变填充和 tooltip 重新设计",
+    "passes": false,
+    "verification": ["CPU/内存图表有渐变填充", "tooltip 样式更精致", "暗色主题下图表颜色协调"]
+  },
+  {
+    "id": 49,
+    "category": "config-management",
+    "description": "后端 API：GET /api/claude-config 获取合并配置",
+    "passes": false,
+    "verification": ["API 返回 settings.json 和 .claude.json 合并后的配置", "包含 env、mcpServers 字段", "配置文件不存在时返回空对象"]
+  },
+  {
+    "id": 50,
+    "category": "config-management",
+    "description": "后端 API：PUT /api/claude-config/env 更新环境变量",
+    "passes": false,
+    "verification": ["可以更新 ANTHROPIC_MODEL 等环境变量", "写入前自动备份", "返回更新后的配置"]
+  },
+  {
+    "id": 51,
+    "category": "config-management",
+    "description": "后端 API：MCP 服务器 CRUD 接口",
+    "passes": false,
+    "verification": ["GET /api/claude-config/mcp 返回服务器列表", "POST 可添加新服务器", "PUT 可更新服务器配置", "DELETE 可删除服务器"]
+  },
+  {
+    "id": 52,
+    "category": "config-management",
+    "description": "后端 API：CLAUDE.md 读写接口",
+    "passes": false,
+    "verification": ["GET /api/claude-config/claudemd 读取指定路径文件", "PUT 保存文件内容", "路径校验只允许 .md 文件", "非法路径返回 400"]
+  },
+  {
+    "id": 53,
+    "category": "config-management",
+    "description": "后端 API：配置备份和恢复接口",
+    "passes": false,
+    "verification": ["POST /api/claude-config/backup 创建备份", "GET /api/claude-config/backups 列出备份", "POST /api/claude-config/restore/:id 恢复备份"]
+  },
+  {
+    "id": 54,
+    "category": "config-management",
+    "description": "前端：新增 /config 路由和导航入口",
+    "passes": false,
+    "verification": ["导航栏显示「配置」链接", "点击跳转到 /config", "路由正确加载 ConfigPage 组件"]
+  },
+  {
+    "id": 55,
+    "category": "config-management",
+    "description": "前端：ConfigPage 环境变量 Tab",
+    "passes": false,
+    "verification": ["显示模型选择下拉框", "API 地址输入框", "API Token 脱敏显示（sk-***...abc）", "点击可切换显示/隐藏", "保存按钮提交更改"]
+  },
+  {
+    "id": 56,
+    "category": "config-management",
+    "description": "前端：ConfigPage MCP 服务器 Tab",
+    "passes": false,
+    "verification": ["列表显示已配置的 MCP 服务器", "每行有编辑/删除按钮", "添加服务器按钮打开表单", "表单包含 name/command/args/env 字段"]
+  },
+  {
+    "id": 57,
+    "category": "config-management",
+    "description": "前端：ConfigPage CLAUDE.md Tab 集成 Monaco Editor",
+    "passes": false,
+    "verification": ["文件选择器可选当前项目/全局/自定义路径", "Monaco Editor 显示文件内容", "Markdown 语法高亮", "主题跟随系统亮暗切换", "Ctrl+S 保存"]
+  },
+  {
+    "id": 58,
+    "category": "config-management",
+    "description": "前端：未保存离开提示",
+    "passes": false,
+    "verification": ["编辑配置后未保存", "切换 Tab 或离开页面时弹出确认框", "确认后丢弃更改", "取消后留在当前页面"]
   }
 ]

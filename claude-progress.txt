@@ -1,7 +1,7 @@
 # Server Monitor - Agent Progress Log
 
 ## Project Status: Active Development
-## Last Updated: 2026-02-15
+## Last Updated: 2026-02-16
 
 ### Completed
 - Initial project setup (Express backend + Vue 3 frontend)
@@ -27,33 +27,13 @@
 - Feature #40: Keyboard shortcuts for navigation
 
 ### Current State
-- All core features implemented and functional
-- Backend runs on port 7777, frontend uses Vite dev server with proxy
-- Responsive CSS added: mobile-first layout with 768px desktop breakpoint
-- Dark mode: toggle button in nav, CSS variables for dark palette, Chart.js grid colors update, localStorage persistence
-- Auto-refresh toggle on Processes page: checkbox controls 5-second polling interval, manual refresh always available
-- CPU per-core breakdown: Dashboard shows individual core bars with color-coded load levels, updates via both REST and WebSocket
-- System info panel: Dashboard shows OS distro, hostname, platform, and kernel version; data loaded once from /api/stats; styled with monospace font
-- Export CSV: Processes page has "导出 CSV" button in toolbar; exports filtered process list as CSV with PID, Name, CPU, Memory, User columns
-- Chart time range selector: Dashboard charts have 1m/5m/15m buttons above charts; selecting a range resizes the data window; default is 1 minute (20 data points at 3s interval)
-- Backend tests: Refactored server.js into app.js (Express app) + server.js (entry point with WebSocket). 10 vitest tests covering /api/stats, /api/processes, DELETE /api/processes/:pid. Run with `cd backend && npm test`.
-- Frontend tests: 27 vitest tests across 4 files covering Toast, ConfirmModal, Dashboard, Processes. Uses @vue/test-utils with jsdom. Chart.js and WebSocket mocked. Run with `cd frontend && npm test`.
-- Memory alert: Warning banner appears on dashboard when memory > 90%. Shows current usage percentage and used/total bytes. Dismissible via X button, reappears if memory drops below 90% then exceeds again. Dark mode compatible.
-
-- Process command-line search: Extended filteredProcesses computed in Processes.vue to also match against p.command (in addition to p.name and p.pid). Updated search placeholder to "搜索进程名称或命令...". Backend already returned command field, so no backend changes needed.
-
-- Disk I/O read/write speed: Added si.fsStats() to backend /api/stats endpoint, returning rxSec/wxSec (bytes/sec). Dashboard shows disk I/O summary line above filesystem list with read/write speeds in human-readable format. Uses existing formatSpeed() helper. Values are null on first API call (fsStats needs two calls to compute delta), so the UI conditionally hides the I/O line until real values are available.
-
-- Network traffic trend chart: Added Chart.js line chart to Dashboard showing total RX (download) and TX (upload) speeds over time. Purple line for RX, amber for TX. Added si.networkStats() to WebSocket broadcast so chart updates in real-time. Chart respects time range selector and dark mode theme. Spans full width below CPU/memory charts on desktop.
-
-- Process tree view: Processes page has a "树视图" toggle button in toolbar. When active, processes are displayed as a tree hierarchy based on parentPid relationships. Parent processes show ▶/▼ expand/collapse toggles. Child processes are indented under their parents. Backend now includes parentPid in /api/processes response.
-
-- Keyboard shortcuts: Added global keydown listener in App.vue. Press 1 for dashboard, 2 for processes, / to focus search, R to refresh. Shortcuts are disabled when typing in input fields. Escape blurs focused inputs.
-
-### Known Issues
-- None currently tracked
+- All 40 core features completed
+- New phase: Visual upgrade + Claude Code config management (features #41-58)
+- Design document: docs/plans/2026-02-16-visual-upgrade-config-management-design.md
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- All 40 features are now complete!
+- Start with Feature #41: 升级全局配色系统
+- Reference design doc for visual specifications
+- Use /frontend-design and /style-design skills for UI work

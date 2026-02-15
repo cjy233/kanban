@@ -1,0 +1,9 @@
+Feature #40 done. Added a global keydown listener in `App.vue` that handles:
+
+- `1` → navigate to dashboard
+- `2` → navigate to processes
+- `/` → focus the search input on the processes page
+- `R` → click the refresh button
+- `Escape` → blur any focused input
+
+Shortcuts are ignored when the user is typing in an input, textarea, or select. Build and smoke test both pass. All 40 features are now complete.
