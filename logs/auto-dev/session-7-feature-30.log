@@ -1,0 +1,1 @@
+Feature #30 is done. Added time range selector buttons (1m, 5m, 15m) above the CPU and memory trend charts in Dashboard.vue. Selecting a range resizes the data history arrays and updates the charts accordingly. Default is 1 minute (20 data points at 3s intervals). Build and smoke test both pass. Committed as `112452f`.

@@ -213,7 +213,7 @@
     "id": 31,
     "category": "testing",
     "description": "Backend API unit tests with vitest or jest",
-    "passes": false,
+    "passes": true,
     "verification": ["Run npm test in backend/", "Tests cover /api/stats, /api/processes, /api/processes/:pid", "All tests pass"]
   },
   {

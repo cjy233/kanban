@@ -19,6 +19,7 @@
 - Feature #29: Export process list to CSV
 
 - Feature #30: Chart time range selector (1min, 5min, 15min)
+- Feature #31: Backend API unit tests with vitest
 
 ### Current State
 - All core features implemented and functional
@@ -30,6 +31,7 @@
 - System info panel: Dashboard shows OS distro, hostname, platform, and kernel version; data loaded once from /api/stats; styled with monospace font
 - Export CSV: Processes page has "导出 CSV" button in toolbar; exports filtered process list as CSV with PID, Name, CPU, Memory, User columns
 - Chart time range selector: Dashboard charts have 1m/5m/15m buttons above charts; selecting a range resizes the data window; default is 1 minute (20 data points at 3s interval)
+- Backend tests: Refactored server.js into app.js (Express app) + server.js (entry point with WebSocket). 10 vitest tests covering /api/stats, /api/processes, DELETE /api/processes/:pid. Run with `cd backend && npm test`.
 
 ### Known Issues
 - None currently tracked
@@ -37,4 +39,4 @@
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick next feature from features.json (lowest ID with passes: false) — should be #31
+- Pick next feature from features.json (lowest ID with passes: false) — should be #32
