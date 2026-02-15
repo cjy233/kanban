@@ -1,0 +1,1 @@
+Feature #27 done. Added a "CPU 核心负载" section to the dashboard that shows individual progress bars for each CPU core (Core 0, Core 1, etc.) with color-coded load levels. Data flows from both the REST API and WebSocket, so it updates in real-time alongside existing stats. The backend already had per-core data — only frontend changes were needed.

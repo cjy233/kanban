@@ -117,6 +117,10 @@
             <span class="info-label">平台</span>
             <span class="info-value">{{ systemInfo.platform }}</span>
           </div>
+          <div class="info-item" v-if="systemInfo.kernel">
+            <span class="info-label">内核</span>
+            <span class="info-value">{{ systemInfo.kernel }}</span>
+          </div>
         </div>
       </div>
     </template>
@@ -489,6 +493,33 @@ onUnmounted(() => {
   border-radius: 12px;
   padding: 12px;
   margin-top: 12px;
+}
+
+.system-info {
+  display: grid;
+  gap: 8px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: var(--color-bg-subtle, #f8fafc);
+  border-radius: 8px;
+}
+
+.info-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.info-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text, #1e293b);
+  font-family: monospace;
 }
 
 .section-title {

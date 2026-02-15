@@ -192,7 +192,7 @@
     "id": 28,
     "category": "enhancement",
     "description": "System info panel (OS, hostname, kernel)",
-    "passes": false,
+    "passes": true,
     "verification": ["Dashboard shows system info section", "Displays OS distro, hostname, platform", "Static data loaded once"]
   },
   {

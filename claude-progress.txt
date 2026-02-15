@@ -15,6 +15,7 @@
 - Feature #25: Dark mode theme toggle
 - Feature #26: Auto-refresh toggle for process list
 - Feature #27: CPU per-core breakdown display
+- Feature #28: System info panel (OS, hostname, kernel)
 
 ### Current State
 - All core features implemented and functional
@@ -23,6 +24,7 @@
 - Dark mode: toggle button in nav, CSS variables for dark palette, Chart.js grid colors update, localStorage persistence
 - Auto-refresh toggle on Processes page: checkbox controls 5-second polling interval, manual refresh always available
 - CPU per-core breakdown: Dashboard shows individual core bars with color-coded load levels, updates via both REST and WebSocket
+- System info panel: Dashboard shows OS distro, hostname, platform, and kernel version; data loaded once from /api/stats; styled with monospace font
 
 ### Known Issues
 - None currently tracked
@@ -30,4 +32,4 @@
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick next feature from features.json (lowest ID with passes: false) — should be #28
+- Pick next feature from features.json (lowest ID with passes: false) — should be #29

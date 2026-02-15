@@ -52,7 +52,7 @@ app.get('/api/stats', async (req, res) => {
         rxSec: n.rx_sec,
         txSec: n.tx_sec
       })),
-      os: { platform: osInfo.platform, distro: osInfo.distro, hostname: osInfo.hostname },
+      os: { platform: osInfo.platform, distro: osInfo.distro, hostname: osInfo.hostname, kernel: osInfo.kernel },
       uptime: time.uptime
     });
   } catch (err) {
