@@ -237,13 +237,39 @@ while true; do
   fi
 
   # ── Run Claude in current terminal ──
-  echo "  ⏳ Starting Claude... (type 'exit' to end and continue)"
+  echo "  ⏳ Starting Claude in tmux... (type 'exit' to end and continue)"
+  echo "  View: tmux attach -t claude-dev"
   echo ""
 
-  # Run Claude in current terminal, log to file
-  claude -p "$PROMPT" --dangerously-skip-permissions 2>&1 | tee "$LOG_FILE"
-  CLAUDE_EXIT=$?
+  # 清理旧会话
+  tmux kill-session -t claude-dev 2>/dev/null
+  sleep 1
 
+  # 创建 tmux 会话并启动 Claude
+  tmux new-session -d -s claude-dev
+  tmux send-keys -t claude-dev "cd '$PROJECT_DIR' && claude --dangerously-skip-permissions" C-m
+  sleep 4
+
+  # 确认 bypass 权限
+  tmux send-keys -t claude-dev "" C-m
+  sleep 1
+
+  # 发送 prompt
+  tmux send-keys -t claude-dev "$PROMPT" C-m
+
+  # 等待用户输入 'exit' 退出 Claude
+  while true; do
+    if ! tmux has-session -t claude-dev 2>/dev/null; then
+      break
+    fi
+    # 检查 Claude 是否还在运行
+    if tmux capture-pane -t claude-dev -p | grep -q "ubuntu@"; then
+      break
+    fi
+    sleep 2
+  done
+
+  CLAUDE_EXIT=0
   echo ""
   echo "  ⏹ Claude exited (code: $CLAUDE_EXIT)"
 
