@@ -1,0 +1,10 @@
+Feature #48 完成。
+
+实现内容：
+- 新增 `createGradient` 创建垂直渐变填充
+- 新增 `getChartColors` 根据主题返回适配颜色（亮色/暗色）
+- 新增 `getTooltipConfig` 配置精致 tooltip（圆角、内边距、主题适配）
+- 修改 `initCharts` 和 `updateChartTheme` 应用渐变和新 tooltip
+- 增强 hover 状态效果
+
+已提交并推送至远程仓库。

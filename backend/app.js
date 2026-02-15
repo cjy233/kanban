@@ -3,6 +3,7 @@ import cors from 'cors';
 import si from 'systeminformation';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import claudeConfigRouter from './routes/claude-config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -10,6 +11,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Claude Code 配置管理 API
+app.use('/api/claude-config', claudeConfigRouter);
 
 // Get system stats
 app.get('/api/stats', async (req, res) => {

@@ -339,7 +339,7 @@
     "id": 49,
     "category": "config-management",
     "description": "后端 API：GET /api/claude-config 获取合并配置",
-    "passes": false,
+    "passes": true,
     "verification": ["API 返回 settings.json 和 .claude.json 合并后的配置", "包含 env、mcpServers 字段", "配置文件不存在时返回空对象"]
   },
   {
