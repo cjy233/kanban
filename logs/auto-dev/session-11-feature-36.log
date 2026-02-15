@@ -1,0 +1,1 @@
+Feature #36 done. The search box on the Processes page now matches against both process name and command line. The change was minimal — one extra condition in the `filteredProcesses` filter and an updated placeholder. Backend already returned the `command` field, so no server changes were needed.

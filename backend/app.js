@@ -14,13 +14,14 @@ app.use(express.static(path.join(__dirname, '../frontend/dist')));
 // Get system stats
 app.get('/api/stats', async (req, res) => {
   try {
-    const [cpu, mem, osInfo, time, disk, network] = await Promise.all([
+    const [cpu, mem, osInfo, time, disk, network, diskIO] = await Promise.all([
       si.currentLoad(),
       si.mem(),
       si.osInfo(),
       si.time(),
       si.fsSize(),
-      si.networkStats()
+      si.networkStats(),
+      si.fsStats()
     ]);
     res.json({
       cpu: { usage: cpu.currentLoad, cores: cpu.cpus.map(c => c.load) },
@@ -49,6 +50,10 @@ app.get('/api/stats', async (req, res) => {
         rxSec: n.rx_sec,
         txSec: n.tx_sec
       })),
+      diskIO: {
+        rxSec: diskIO.rx_sec,
+        wxSec: diskIO.wx_sec
+      },
       os: { platform: osInfo.platform, distro: osInfo.distro, hostname: osInfo.hostname, kernel: osInfo.kernel },
       uptime: time.uptime
     });

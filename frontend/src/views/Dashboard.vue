@@ -84,6 +84,11 @@
       <!-- 磁盘使用 -->
       <div class="disk-section" v-if="diskInfo.length">
         <h3 class="section-title">存储概览</h3>
+        <div class="disk-io-summary" v-if="diskIO.rxSec !== null">
+          <span class="disk-io-label">磁盘 I/O:</span>
+          <span class="disk-io-read">↓ 读取 {{ formatSpeed(diskIO.rxSec) }}/s</span>
+          <span class="disk-io-write">↑ 写入 {{ formatSpeed(diskIO.wxSec) }}/s</span>
+        </div>
         <div class="disk-list">
           <div class="disk-item" v-for="disk in diskInfo" :key="disk.mount">
             <div class="disk-device">{{ disk.fs }} · {{ disk.type || '未知' }}</div>
@@ -165,6 +170,7 @@ const uptime = ref('-')
 const uptimeSeconds = ref(0)
 const systemInfo = ref(null)
 const diskInfo = ref([])
+const diskIO = ref({ rxSec: null, wxSec: null })
 const networkInfo = ref([])
 const cpuCores = ref([])
 const lastUpdateTime = ref(null)
@@ -369,6 +375,7 @@ const fetchStats = async () => {
     uptime.value = formatUptime(data.uptime)
     systemInfo.value = data.os
     diskInfo.value = data.disk || []
+    diskIO.value = data.diskIO || { rxSec: null, wxSec: null }
     networkInfo.value = data.network || []
     lastUpdateTime.value = Date.now()
     dataLoaded.value = true
@@ -700,6 +707,30 @@ onUnmounted(() => {
   margin-top: 4px;
   font-size: 12px;
   color: var(--color-text-secondary, #64748b);
+}
+
+.disk-io-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  background: var(--color-bg-subtle, #f8fafc);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.disk-io-label {
+  font-weight: 500;
+  color: var(--color-text, #1e293b);
+}
+
+.disk-io-read {
+  color: var(--color-primary, #2563eb);
+}
+
+.disk-io-write {
+  color: var(--color-warning, #f59e0b);
 }
 
 .network-item {

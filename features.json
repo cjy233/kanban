@@ -255,7 +255,7 @@
     "id": 37,
     "category": "enhancement",
     "description": "Disk I/O read/write speed display",
-    "passes": false,
+    "passes": true,
     "verification": ["Dashboard disk section shows read/write speeds", "Values update periodically", "Displayed in human-readable format (MB/s)"]
   },
   {
