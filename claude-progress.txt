@@ -20,6 +20,7 @@
 
 - Feature #30: Chart time range selector (1min, 5min, 15min)
 - Feature #31: Backend API unit tests with vitest
+- Feature #32: Frontend component tests with vitest
 
 ### Current State
 - All core features implemented and functional
@@ -32,6 +33,7 @@
 - Export CSV: Processes page has "导出 CSV" button in toolbar; exports filtered process list as CSV with PID, Name, CPU, Memory, User columns
 - Chart time range selector: Dashboard charts have 1m/5m/15m buttons above charts; selecting a range resizes the data window; default is 1 minute (20 data points at 3s interval)
 - Backend tests: Refactored server.js into app.js (Express app) + server.js (entry point with WebSocket). 10 vitest tests covering /api/stats, /api/processes, DELETE /api/processes/:pid. Run with `cd backend && npm test`.
+- Frontend tests: 27 vitest tests across 4 files covering Toast, ConfirmModal, Dashboard, Processes. Uses @vue/test-utils with jsdom. Chart.js and WebSocket mocked. Run with `cd frontend && npm test`.
 
 ### Known Issues
 - None currently tracked
@@ -39,4 +41,4 @@
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick next feature from features.json (lowest ID with passes: false) — should be #32
+- Pick next feature from features.json (lowest ID with passes: false) — should be #33
