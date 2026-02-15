@@ -50,6 +50,16 @@
       </div>
 
       <div class="charts-grid">
+        <div class="chart-range-selector">
+          <span class="chart-range-label">时间范围:</span>
+          <button
+            v-for="opt in chartRangeOptions"
+            :key="opt.label"
+            class="chart-range-btn"
+            :class="{ active: chartRange.label === opt.label }"
+            @click="setChartRange(opt)"
+          >{{ opt.label }}</button>
+        </div>
         <div class="chart-container">
           <h3 class="chart-title">CPU 使用率趋势</h3>
           <div class="chart-wrapper">
@@ -189,8 +199,37 @@ let lastUpdateTimer = null
 let themeObserver = null
 
 const MAX_RECONNECT_ATTEMPTS = 5
-const cpuHistory = Array(30).fill(0)
-const memHistory = Array(30).fill(0)
+
+const chartRangeOptions = [
+  { label: '1m', seconds: 60, points: 20 },
+  { label: '5m', seconds: 300, points: 100 },
+  { label: '15m', seconds: 900, points: 300 }
+]
+const chartRange = ref(chartRangeOptions[0])
+let cpuHistory = Array(chartRange.value.points).fill(0)
+let memHistory = Array(chartRange.value.points).fill(0)
+
+const setChartRange = (option) => {
+  const oldLen = cpuHistory.length
+  const newLen = option.points
+  chartRange.value = option
+  if (newLen > oldLen) {
+    cpuHistory = Array(newLen - oldLen).fill(0).concat(cpuHistory)
+    memHistory = Array(newLen - oldLen).fill(0).concat(memHistory)
+  } else {
+    cpuHistory = cpuHistory.slice(oldLen - newLen)
+    memHistory = memHistory.slice(oldLen - newLen)
+  }
+  if (cpuChart && memChart) {
+    const labels = Array(newLen).fill('')
+    cpuChart.data.labels = labels
+    cpuChart.data.datasets[0].data = cpuHistory
+    memChart.data.labels = labels
+    memChart.data.datasets[0].data = memHistory
+    cpuChart.update('none')
+    memChart.update('none')
+  }
+}
 
 const lastUpdateAgo = computed(() => {
   if (!lastUpdateTime.value) return ''
@@ -242,7 +281,7 @@ const initCharts = () => {
   cpuChart = new Chart(cpuChartRef.value, {
     type: 'line',
     data: {
-      labels: Array(30).fill(''),
+      labels: Array(chartRange.value.points).fill(''),
       datasets: [{
         data: cpuHistory,
         borderColor: '#2563eb',
@@ -258,7 +297,7 @@ const initCharts = () => {
   memChart = new Chart(memChartRef.value, {
     type: 'line',
     data: {
-      labels: Array(30).fill(''),
+      labels: Array(chartRange.value.points).fill(''),
       datasets: [{
         data: memHistory,
         borderColor: '#10b981',
@@ -676,6 +715,41 @@ onUnmounted(() => {
   font-weight: 600;
   min-width: 48px;
   text-align: right;
+}
+
+.chart-range-selector {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.chart-range-label {
+  font-size: 13px;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.chart-range-btn {
+  padding: 4px 12px;
+  font-size: 13px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
+  background: var(--color-bg, #fff);
+  color: var(--color-text-secondary, #64748b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chart-range-btn:hover {
+  border-color: var(--color-primary, #2563eb);
+  color: var(--color-primary, #2563eb);
+}
+
+.chart-range-btn.active {
+  background: var(--color-primary, #2563eb);
+  border-color: var(--color-primary, #2563eb);
+  color: #fff;
 }
 
 @media (min-width: 768px) {

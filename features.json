@@ -206,7 +206,7 @@
     "id": 30,
     "category": "enhancement",
     "description": "Chart time range selector (1min, 5min, 15min)",
-    "passes": false,
+    "passes": true,
     "verification": ["Dashboard charts have time range buttons", "Selecting range adjusts x-axis window", "Data points retained for selected range"]
   },
   {
