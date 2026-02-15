@@ -23,6 +23,7 @@
 - Feature #36: Process command-line search (not just name)
 - Feature #37: Disk I/O read/write speed display
 - Feature #38: Network traffic trend chart
+- Feature #39: Process tree view showing parent-child relationships
 
 ### Current State
 - All core features implemented and functional
@@ -44,10 +45,12 @@
 
 - Network traffic trend chart: Added Chart.js line chart to Dashboard showing total RX (download) and TX (upload) speeds over time. Purple line for RX, amber for TX. Added si.networkStats() to WebSocket broadcast so chart updates in real-time. Chart respects time range selector and dark mode theme. Spans full width below CPU/memory charts on desktop.
 
+- Process tree view: Processes page has a "树视图" toggle button in toolbar. When active, processes are displayed as a tree hierarchy based on parentPid relationships. Parent processes show ▶/▼ expand/collapse toggles. Child processes are indented under their parents. Backend now includes parentPid in /api/processes response.
+
 ### Known Issues
 - None currently tracked
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Pick next feature from features.json (lowest ID with passes: false) — should be #39
+- Pick next feature from features.json (lowest ID with passes: false) — should be #40
