@@ -490,4 +490,233 @@ router.put('/claudemd', async (req, res) => {
   }
 });
 
+// ==================== 配置备份与恢复 ====================
+
+// 备份目录：~/.claude/backups/
+const BACKUP_DIR = path.join(os.homedir(), '.claude', 'backups');
+
+/**
+ * 确保备份目录存在
+ */
+async function ensureBackupDir() {
+  await fs.mkdir(BACKUP_DIR, { recursive: true });
+}
+
+/**
+ * 生成备份 ID（时间戳格式）
+ * @returns {string} - 格式：YYYYMMDD-HHmmss-SSS
+ */
+function generateBackupId() {
+  const now = new Date();
+  const pad = (n, len = 2) => String(n).padStart(len, '0');
+  return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}-${pad(now.getMilliseconds(), 3)}`;
+}
+
+/**
+ * 备份配置文件到指定目录
+ * @param {string} backupPath - 备份目录路径
+ * @returns {Promise<Array>} - 备份的文件列表 [{name, size}]
+ */
+async function backupConfigFiles(backupPath) {
+  const files = [];
+
+  // 备份 settings.json
+  try {
+    const content = await fs.readFile(CONFIG_PATHS.globalSettings, 'utf-8');
+    await fs.writeFile(path.join(backupPath, 'settings.json'), content, 'utf-8');
+    files.push({ name: 'settings.json', size: content.length });
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+    // 文件不存在，跳过
+  }
+
+  // 备份 .claude.json
+  try {
+    const content = await fs.readFile(CONFIG_PATHS.projectConfig, 'utf-8');
+    await fs.writeFile(path.join(backupPath, '.claude.json'), content, 'utf-8');
+    files.push({ name: '.claude.json', size: content.length });
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+    // 文件不存在，跳过
+  }
+
+  return files;
+}
+
+/**
+ * POST /api/claude-config/backup
+ * 创建配置备份
+ * 备份 settings.json 和 .claude.json 到 ~/.claude/backups/{id}/
+ */
+router.post('/backup', async (req, res) => {
+  try {
+    await ensureBackupDir();
+
+    const backupId = generateBackupId();
+    const backupPath = path.join(BACKUP_DIR, backupId);
+    await fs.mkdir(backupPath, { recursive: true });
+
+    // 使用共享函数备份配置文件
+    const files = await backupConfigFiles(backupPath);
+
+    // 如果没有任何文件可备份
+    if (files.length === 0) {
+      // 删除空备份目录
+      await fs.rmdir(backupPath);
+      return res.status(400).json({ error: '没有配置文件可备份' });
+    }
+
+    // 写入元数据
+    const metadata = {
+      id: backupId,
+      createdAt: new Date().toISOString(),
+      files
+    };
+    await fs.writeFile(path.join(backupPath, 'metadata.json'), JSON.stringify(metadata, null, 2), 'utf-8');
+
+    res.status(201).json({
+      message: '备份创建成功',
+      backup: metadata
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/claude-config/backups
+ * 列出所有配置备份
+ * 返回按时间倒序排列的备份列表
+ */
+router.get('/backups', async (req, res) => {
+  try {
+    await ensureBackupDir();
+
+    // 读取备份目录
+    let entries;
+    try {
+      entries = await fs.readdir(BACKUP_DIR, { withFileTypes: true });
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return res.json({ backups: [] });
+      }
+      throw err;
+    }
+
+    // 过滤出目录并读取元数据
+    const backups = [];
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+
+      const metadataPath = path.join(BACKUP_DIR, entry.name, 'metadata.json');
+      try {
+        const metadataContent = await fs.readFile(metadataPath, 'utf-8');
+        const metadata = JSON.parse(metadataContent);
+        backups.push(metadata);
+      } catch {
+        // 元数据不存在或解析失败，跳过
+      }
+    }
+
+    // 按创建时间倒序排列
+    backups.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    res.json({ backups });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/claude-config/restore/:id
+ * 恢复指定备份
+ * 恢复前会自动创建当前配置的备份
+ */
+router.post('/restore/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 验证备份 ID 格式（防止路径遍历）
+    if (!/^\d{8}-\d{6}-\d{3}$/.test(id)) {
+      return res.status(400).json({ error: '无效的备份 ID 格式' });
+    }
+
+    const backupPath = path.join(BACKUP_DIR, id);
+
+    // 检查备份是否存在
+    try {
+      await fs.access(backupPath);
+    } catch {
+      return res.status(404).json({ error: `备份 "${id}" 不存在` });
+    }
+
+    // 验证备份元数据完整性
+    try {
+      await fs.access(path.join(backupPath, 'metadata.json'));
+    } catch {
+      return res.status(500).json({ error: '备份元数据损坏' });
+    }
+
+    // 恢复前先备份当前配置（自动备份）
+    const preRestoreBackupId = generateBackupId();
+    const preRestoreBackupPath = path.join(BACKUP_DIR, preRestoreBackupId);
+    await fs.mkdir(preRestoreBackupPath, { recursive: true });
+
+    // 使用共享函数备份当前配置
+    const preRestoreFiles = await backupConfigFiles(preRestoreBackupPath);
+
+    // 写入自动备份元数据
+    if (preRestoreFiles.length > 0) {
+      const preRestoreMetadata = {
+        id: preRestoreBackupId,
+        createdAt: new Date().toISOString(),
+        files: preRestoreFiles,
+        autoBackup: true,
+        reason: `恢复备份 ${id} 前自动创建`
+      };
+      await fs.writeFile(
+        path.join(preRestoreBackupPath, 'metadata.json'),
+        JSON.stringify(preRestoreMetadata, null, 2),
+        'utf-8'
+      );
+    } else {
+      // 没有文件需要备份，删除空目录
+      await fs.rmdir(preRestoreBackupPath);
+    }
+
+    // 恢复配置文件
+    const restoredFiles = [];
+
+    // 恢复 settings.json
+    try {
+      const content = await fs.readFile(path.join(backupPath, 'settings.json'), 'utf-8');
+      // 确保目录存在
+      await fs.mkdir(path.dirname(CONFIG_PATHS.globalSettings), { recursive: true });
+      await fs.writeFile(CONFIG_PATHS.globalSettings, content, 'utf-8');
+      restoredFiles.push('settings.json');
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+      // 备份中没有此文件，跳过
+    }
+
+    // 恢复 .claude.json
+    try {
+      const content = await fs.readFile(path.join(backupPath, '.claude.json'), 'utf-8');
+      await fs.writeFile(CONFIG_PATHS.projectConfig, content, 'utf-8');
+      restoredFiles.push('.claude.json');
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+      // 备份中没有此文件，跳过
+    }
+
+    res.json({
+      message: `备份 "${id}" 恢复成功`,
+      restoredFiles,
+      preRestoreBackup: preRestoreFiles.length > 0 ? preRestoreBackupId : null
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

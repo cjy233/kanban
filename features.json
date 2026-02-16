@@ -367,7 +367,7 @@
     "id": 53,
     "category": "config-management",
     "description": "后端 API：配置备份和恢复接口",
-    "passes": false,
+    "passes": true,
     "verification": ["POST /api/claude-config/backup 创建备份", "GET /api/claude-config/backups 列出备份", "POST /api/claude-config/restore/:id 恢复备份"]
   },
   {
