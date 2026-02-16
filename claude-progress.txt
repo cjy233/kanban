@@ -46,8 +46,20 @@
 - 添加加载状态显示
 - Code review 通过，构建成功
 
+### Session 2026-02-16 (Feature #57)
+- 实现 ConfigPage CLAUDE.md Tab 集成 Monaco Editor
+- 新增 MonacoEditor.vue 组件封装
+- 文件选择器支持当前项目/全局/自定义路径
+- Monaco Editor 显示 Markdown 内容，语法高亮
+- 主题跟随系统亮暗切换（使用 MutationObserver 监听）
+- Ctrl+S 保存快捷键
+- 未保存状态指示（dirty indicator）
+- 切换路径时未保存警告弹窗
+- 自定义路径支持 Enter 键加载
+- Code review 通过，构建成功
+
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Start with Feature #57: 前端：ConfigPage CLAUDE.md Tab 集成 Monaco Editor
-- 注意：测试时不要真的修改配置文件，会影响 Claude Code 运行
+- Start with Feature #58: 前端：未保存离开提示
+- 剩余 1 个 feature 未完成
