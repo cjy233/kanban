@@ -388,7 +388,7 @@
     "id": 56,
     "category": "config-management",
     "description": "前端：ConfigPage MCP 服务器 Tab",
-    "passes": false,
+    "passes": true,
     "verification": ["列表显示已配置的 MCP 服务器", "每行有编辑/删除按钮", "添加服务器按钮打开表单", "表单包含 name/command/args/env 字段"]
   },
   {
