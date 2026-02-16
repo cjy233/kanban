@@ -8,7 +8,7 @@
         v-for="tab in tabs"
         :key="tab.id"
         :class="['tab-btn', { active: activeTab === tab.id }]"
-        @click="activeTab = tab.id"
+        @click="handleTabSwitch(tab.id)"
       >
         {{ tab.label }}
       </button>
@@ -303,11 +303,34 @@
       @confirm="confirmSwitchClaudeMd"
       @cancel="cancelSwitchClaudeMd"
     />
+
+    <!-- Tab 切换确认弹窗 -->
+    <ConfirmModal
+      v-model:show="showTabSwitchConfirm"
+      title="未保存的更改"
+      message="当前配置有未保存的更改，切换后将丢失。确定要切换吗？"
+      confirm-text="切换"
+      confirm-class="btn-warning"
+      @confirm="confirmTabSwitch"
+      @cancel="cancelTabSwitch"
+    />
+
+    <!-- 离开页面确认弹窗 -->
+    <ConfirmModal
+      v-model:show="showLeaveConfirm"
+      title="未保存的更改"
+      message="当前页面有未保存的更改，离开后将丢失。确定要离开吗？"
+      confirm-text="离开"
+      confirm-class="btn-warning"
+      @confirm="confirmLeave"
+      @cancel="cancelLeave"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount, computed, watch } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import Toast from '../components/Toast.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 import MonacoEditor from '../components/MonacoEditor.vue'
@@ -330,6 +353,14 @@ const modelOptions = [
 
 // 环境变量表单
 const envForm = reactive({
+  model: 'claude-sonnet-4-5-20250929',
+  apiBaseUrl: '',
+  apiKey: '',
+  timeout: 30000
+})
+
+// 环境变量原始值（用于检测未保存更改）
+const envFormOriginal = reactive({
   model: 'claude-sonnet-4-5-20250929',
   apiBaseUrl: '',
   apiKey: '',
@@ -385,6 +416,19 @@ const claudemdDirty = computed(() => {
   return claudemdContent.value !== claudemdOriginalContent.value
 })
 
+// 计算环境变量是否有未保存的更改
+const envDirty = computed(() => {
+  return envForm.model !== envFormOriginal.model ||
+    envForm.apiBaseUrl !== envFormOriginal.apiBaseUrl ||
+    envForm.apiKey !== envFormOriginal.apiKey ||
+    envForm.timeout !== envFormOriginal.timeout
+})
+
+// 计算任意 Tab 是否有未保存的更改
+const hasUnsavedChanges = computed(() => {
+  return envDirty.value || claudemdDirty.value
+})
+
 // 获取当前选择的路径
 function getClaudeMdPath() {
   switch (claudemdPathType.value) {
@@ -403,6 +447,14 @@ function getClaudeMdPath() {
 const showClaudemdSwitchConfirm = ref(false)
 const previousPathType = ref('project')
 let skipNextWatch = false
+
+// Tab 切换确认弹窗状态
+const showTabSwitchConfirm = ref(false)
+const pendingTab = ref(null)
+
+// 离开页面确认弹窗状态
+const showLeaveConfirm = ref(false)
+let pendingNavigation = null
 
 // 监听路径类型变化
 watch(claudemdPathType, (newValue, oldValue) => {
@@ -433,6 +485,49 @@ function cancelSwitchClaudeMd() {
   skipNextWatch = true
   claudemdPathType.value = previousPathType.value
   showClaudemdSwitchConfirm.value = false
+}
+
+// 处理 Tab 切换
+function handleTabSwitch(tabId) {
+  if (tabId === activeTab.value) return
+
+  // 检查当前 Tab 是否有未保存更改
+  const currentTabDirty =
+    (activeTab.value === 'env' && envDirty.value) ||
+    (activeTab.value === 'claudemd' && claudemdDirty.value)
+
+  if (currentTabDirty) {
+    pendingTab.value = tabId
+    showTabSwitchConfirm.value = true
+  } else {
+    activeTab.value = tabId
+  }
+}
+
+// 确认切换 Tab
+function confirmTabSwitch() {
+  showTabSwitchConfirm.value = false
+  if (pendingTab.value) {
+    // 丢弃当前 Tab 的更改
+    if (activeTab.value === 'env') {
+      // 恢复环境变量原始值
+      envForm.model = envFormOriginal.model
+      envForm.apiBaseUrl = envFormOriginal.apiBaseUrl
+      envForm.apiKey = envFormOriginal.apiKey
+      envForm.timeout = envFormOriginal.timeout
+    } else if (activeTab.value === 'claudemd') {
+      // 恢复 CLAUDE.md 原始内容
+      claudemdContent.value = claudemdOriginalContent.value
+    }
+    activeTab.value = pendingTab.value
+    pendingTab.value = null
+  }
+}
+
+// 取消切换 Tab
+function cancelTabSwitch() {
+  showTabSwitchConfirm.value = false
+  pendingTab.value = null
 }
 
 // 加载 CLAUDE.md 文件
@@ -524,6 +619,12 @@ async function loadConfig() {
       envForm.apiBaseUrl = data.env.ANTHROPIC_BASE_URL || ''
       envForm.apiKey = data.env.ANTHROPIC_API_KEY || ''
       envForm.timeout = data.env.ANTHROPIC_TIMEOUT || 30000
+
+      // 保存原始值
+      envFormOriginal.model = envForm.model
+      envFormOriginal.apiBaseUrl = envForm.apiBaseUrl
+      envFormOriginal.apiKey = envForm.apiKey
+      envFormOriginal.timeout = envForm.timeout
     }
   } catch (err) {
     console.error('加载配置失败:', err)
@@ -553,6 +654,12 @@ async function saveEnvConfig() {
       throw new Error(err.error || '保存失败')
     }
 
+    // 更新原始值
+    envFormOriginal.model = envForm.model
+    envFormOriginal.apiBaseUrl = envForm.apiBaseUrl
+    envFormOriginal.apiKey = envForm.apiKey
+    envFormOriginal.timeout = envForm.timeout
+
     showToast('配置已保存', 'success')
   } catch (err) {
     showToast('保存失败: ' + err.message, 'error')
@@ -577,6 +684,9 @@ onMounted(() => {
     attributes: true,
     attributeFilter: ['data-theme']
   })
+
+  // 监听浏览器关闭/刷新事件
+  window.addEventListener('beforeunload', handleBeforeUnload)
 })
 
 onBeforeUnmount(() => {
@@ -584,7 +694,42 @@ onBeforeUnmount(() => {
     themeObserver.disconnect()
     themeObserver = null
   }
+  window.removeEventListener('beforeunload', handleBeforeUnload)
 })
+
+// 浏览器关闭/刷新前的提示
+function handleBeforeUnload(e) {
+  if (hasUnsavedChanges.value) {
+    e.preventDefault()
+    e.returnValue = ''
+    return ''
+  }
+}
+
+// Vue Router 离开页面前的确认
+onBeforeRouteLeave((to, from, next) => {
+  if (hasUnsavedChanges.value) {
+    pendingNavigation = next
+    showLeaveConfirm.value = true
+  } else {
+    next()
+  }
+})
+
+// 确认离开页面
+function confirmLeave() {
+  showLeaveConfirm.value = false
+  if (pendingNavigation) {
+    pendingNavigation()
+    pendingNavigation = null
+  }
+}
+
+// 取消离开页面
+function cancelLeave() {
+  showLeaveConfirm.value = false
+  pendingNavigation = null
+}
 
 // 加载 MCP 服务器列表
 async function loadMcpServers() {

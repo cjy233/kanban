@@ -402,7 +402,7 @@
     "id": 58,
     "category": "config-management",
     "description": "前端：未保存离开提示",
-    "passes": false,
+    "passes": true,
     "verification": ["编辑配置后未保存", "切换 Tab 或离开页面时弹出确认框", "确认后丢弃更改", "取消后留在当前页面"]
   }
 ]
