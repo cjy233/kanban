@@ -156,4 +156,198 @@ router.put('/env', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/claude-config/mcp
+ * 获取 MCP 服务器列表
+ * 返回合并后的 mcpServers 对象（项目配置覆盖全局配置）
+ */
+router.get('/mcp', async (req, res) => {
+  try {
+    const [globalSettings, projectConfig] = await Promise.all([
+      readJsonFile(CONFIG_PATHS.globalSettings),
+      readJsonFile(CONFIG_PATHS.projectConfig)
+    ]);
+
+    // 合并 mcpServers：项目配置优先
+    const globalMcp = globalSettings.mcpServers || {};
+    const projectMcp = projectConfig.mcpServers || {};
+    const mergedMcp = { ...globalMcp, ...projectMcp };
+
+    // 转换为数组格式，便于前端展示
+    // source 字段标识配置来源：global 可编辑，project 只读
+    const servers = Object.entries(mergedMcp).map(([name, config]) => ({
+      name,
+      ...config,
+      source: projectMcp[name] ? 'project' : 'global'
+    }));
+
+    res.json({ servers });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/claude-config/mcp
+ * 添加 MCP 服务器
+ * 接收 JSON body { name, command, args?, env? }
+ * 写入 ~/.claude/settings.json 的 mcpServers 字段
+ */
+router.post('/mcp', async (req, res) => {
+  try {
+    const { name, command, args, env } = req.body;
+
+    // 验证必填字段
+    if (!name || typeof name !== 'string') {
+      return res.status(400).json({ error: 'name 是必填字段且必须是字符串' });
+    }
+    if (!command || typeof command !== 'string') {
+      return res.status(400).json({ error: 'command 是必填字段且必须是字符串' });
+    }
+
+    // 读取当前全局配置
+    const globalSettings = await readJsonFile(CONFIG_PATHS.globalSettings);
+    const mcpServers = globalSettings.mcpServers || {};
+
+    // 检查名称唯一性
+    if (mcpServers[name]) {
+      return res.status(409).json({ error: `MCP 服务器 "${name}" 已存在` });
+    }
+
+    // 构建服务器配置
+    const serverConfig = { command };
+    if (args !== undefined) {
+      if (!Array.isArray(args)) {
+        return res.status(400).json({ error: 'args 必须是数组' });
+      }
+      serverConfig.args = args;
+    }
+    if (env !== undefined) {
+      if (typeof env !== 'object' || Array.isArray(env) || env === null) {
+        return res.status(400).json({ error: 'env 必须是对象' });
+      }
+      serverConfig.env = env;
+    }
+
+    // 添加服务器
+    mcpServers[name] = serverConfig;
+    globalSettings.mcpServers = mcpServers;
+
+    // 写回文件
+    const backupPath = await writeJsonFile(CONFIG_PATHS.globalSettings, globalSettings);
+
+    res.status(201).json({
+      message: `MCP 服务器 "${name}" 创建成功`,
+      server: { name, ...serverConfig },
+      _backup: backupPath
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * PUT /api/claude-config/mcp/:name
+ * 更新 MCP 服务器
+ * 接收 JSON body { command?, args?, env?, newName? }
+ */
+router.put('/mcp/:name', async (req, res) => {
+  try {
+    const { name } = req.params;
+    const { command, args, env, newName } = req.body;
+
+    // 读取当前全局配置
+    const globalSettings = await readJsonFile(CONFIG_PATHS.globalSettings);
+    const mcpServers = globalSettings.mcpServers || {};
+
+    // 检查服务器是否存在
+    if (!mcpServers[name]) {
+      return res.status(404).json({ error: `MCP 服务器 "${name}" 不存在` });
+    }
+
+    // 如果要重命名，检查新名称是否已存在
+    if (newName && newName !== name && mcpServers[newName]) {
+      return res.status(409).json({ error: `MCP 服务器 "${newName}" 已存在` });
+    }
+
+    // 获取当前配置
+    const serverConfig = { ...mcpServers[name] };
+
+    // 更新字段
+    if (command !== undefined) {
+      if (typeof command !== 'string') {
+        return res.status(400).json({ error: 'command 必须是字符串' });
+      }
+      serverConfig.command = command;
+    }
+    if (args !== undefined) {
+      if (!Array.isArray(args)) {
+        return res.status(400).json({ error: 'args 必须是数组' });
+      }
+      serverConfig.args = args;
+    }
+    if (env !== undefined) {
+      if (typeof env !== 'object' || Array.isArray(env) || env === null) {
+        return res.status(400).json({ error: 'env 必须是对象' });
+      }
+      serverConfig.env = env;
+    }
+
+    // 处理重命名
+    if (newName && newName !== name) {
+      delete mcpServers[name];
+      mcpServers[newName] = serverConfig;
+    } else {
+      mcpServers[name] = serverConfig;
+    }
+
+    globalSettings.mcpServers = mcpServers;
+
+    // 写回文件
+    const backupPath = await writeJsonFile(CONFIG_PATHS.globalSettings, globalSettings);
+
+    const finalName = newName || name;
+    res.json({
+      message: `MCP 服务器 "${finalName}" 更新成功`,
+      server: { name: finalName, ...serverConfig },
+      _backup: backupPath
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * DELETE /api/claude-config/mcp/:name
+ * 删除 MCP 服务器
+ */
+router.delete('/mcp/:name', async (req, res) => {
+  try {
+    const { name } = req.params;
+
+    // 读取当前全局配置
+    const globalSettings = await readJsonFile(CONFIG_PATHS.globalSettings);
+    const mcpServers = globalSettings.mcpServers || {};
+
+    // 检查服务器是否存在
+    if (!mcpServers[name]) {
+      return res.status(404).json({ error: `MCP 服务器 "${name}" 不存在` });
+    }
+
+    // 删除服务器
+    delete mcpServers[name];
+    globalSettings.mcpServers = mcpServers;
+
+    // 写回文件
+    const backupPath = await writeJsonFile(CONFIG_PATHS.globalSettings, globalSettings);
+
+    res.json({
+      message: `MCP 服务器 "${name}" 已删除`,
+      _backup: backupPath
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

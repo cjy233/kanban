@@ -353,7 +353,7 @@
     "id": 51,
     "category": "config-management",
     "description": "后端 API：MCP 服务器 CRUD 接口",
-    "passes": false,
+    "passes": true,
     "verification": ["GET /api/claude-config/mcp 返回服务器列表", "POST 可添加新服务器", "PUT 可更新服务器配置", "DELETE 可删除服务器"]
   },
   {
