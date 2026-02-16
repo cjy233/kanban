@@ -242,32 +242,13 @@ while true; do
   echo ""
 
   # 清理旧会话
-  tmux kill-session -t claude-dev 2>/dev/null
-  sleep 1
-
-  # 创建 tmux 会话并启动 Claude
-  tmux new-session -d -s claude-dev
-  tmux send-keys -t claude-dev "cd '$PROJECT_DIR' && claude --dangerously-skip-permissions" C-m
-  sleep 4
-
-  # 确认 bypass 权限
-  tmux send-keys -t claude-dev "" C-m
-  sleep 1
-
-  # 发送 prompt
-  tmux send-keys -t claude-dev "$PROMPT" C-m
-
-  echo "  Claude 已在 tmux 中运行"
-  echo "  查看输出: tmux attach -t claude-dev (在新终端)"
-  echo "  完成后输入 'exit' 退出 Claude"
+  echo "  ⏳ Starting Claude... (type 'exit' to end and continue)"
   echo ""
 
-  # 等待用户输入 'exit' 退出 Claude (通过检测会话是否存在)
-  while tmux has-session -t claude-dev 2>/dev/null; do
-    sleep 2
-  done
-
-  CLAUDE_EXIT=0
+  # 直接运行 Claude 并传递 prompt，保持交互式
+  cd "$PROJECT_DIR"
+  echo "$PROMPT" | claude --dangerously-skip-permissions
+  CLAUDE_EXIT=$?
   echo ""
   echo "  ⏹ Claude exited (code: $CLAUDE_EXIT)"
 
