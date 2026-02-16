@@ -257,15 +257,13 @@ while true; do
   # 发送 prompt
   tmux send-keys -t claude-dev "$PROMPT" C-m
 
-  # 等待用户输入 'exit' 退出 Claude
-  while true; do
-    if ! tmux has-session -t claude-dev 2>/dev/null; then
-      break
-    fi
-    # 检查 Claude 是否还在运行
-    if tmux capture-pane -t claude-dev -p | grep -q "ubuntu@"; then
-      break
-    fi
+  echo "  Claude 已在 tmux 中运行"
+  echo "  查看输出: tmux attach -t claude-dev (在新终端)"
+  echo "  完成后输入 'exit' 退出 Claude"
+  echo ""
+
+  # 等待用户输入 'exit' 退出 Claude (通过检测会话是否存在)
+  while tmux has-session -t claude-dev 2>/dev/null; do
     sleep 2
   done
 
