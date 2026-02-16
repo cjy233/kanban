@@ -237,17 +237,12 @@ while true; do
   fi
 
   # ── Run Claude in current terminal ──
-  echo "  ⏳ Starting Claude in tmux... (type 'exit' to end and continue)"
-  echo "  View: tmux attach -t claude-dev"
-  echo ""
-
-  # 清理旧会话
   echo "  ⏳ Starting Claude... (type 'exit' to end and continue)"
   echo ""
 
   # 直接运行 Claude 并传递 prompt，保持交互式
   cd "$PROJECT_DIR"
-  echo "$PROMPT" | claude --dangerously-skip-permissions
+  claude --dangerously-skip-permissions "$PROMPT"
   CLAUDE_EXIT=$?
   echo ""
   echo "  ⏹ Claude exited (code: $CLAUDE_EXIT)"
