@@ -374,7 +374,7 @@
     "id": 54,
     "category": "config-management",
     "description": "前端：新增 /config 路由和导航入口",
-    "passes": false,
+    "passes": true,
     "verification": ["导航栏显示「配置」链接", "点击跳转到 /config", "路由正确加载 ConfigPage 组件"]
   },
   {

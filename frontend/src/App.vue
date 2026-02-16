@@ -9,6 +9,7 @@
       <div class="nav-links">
         <router-link to="/">仪表盘</router-link>
         <router-link to="/processes">进程管理</router-link>
+        <router-link to="/config">配置</router-link>
         <button class="theme-toggle" @click="toggleTheme" :title="isDark ? '切换亮色模式' : '切换暗色模式'">
           {{ isDark ? '☀️' : '🌙' }}
         </button>
@@ -47,6 +48,9 @@ const handleKeydown = (e) => {
       break
     case '2':
       router.push('/processes')
+      break
+    case '3':
+      router.push('/config')
       break
     case '/': {
       e.preventDefault()
