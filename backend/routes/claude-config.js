@@ -75,4 +75,85 @@ router.get('/', async (req, res) => {
   }
 });
 
+/**
+ * 创建文件备份
+ * @param {string} filePath - 要备份的文件路径
+ * @returns {Promise<string|null>} - 备份文件路径，文件不存在则返回 null
+ */
+async function createBackup(filePath) {
+  try {
+    // 检查文件是否存在
+    await fs.access(filePath);
+    // 生成备份文件名：原文件名.bak
+    const backupPath = `${filePath}.bak`;
+    await fs.copyFile(filePath, backupPath);
+    return backupPath;
+  } catch (err) {
+    // 文件不存在，无需备份
+    return null;
+  }
+}
+
+/**
+ * 安全写入 JSON 文件（写入前自动备份）
+ * @param {string} filePath - 文件路径
+ * @param {object} data - 要写入的数据
+ * @returns {Promise<string|null>} - 备份文件路径
+ */
+async function writeJsonFile(filePath, data) {
+  // 写入前创建备份
+  const backupPath = await createBackup(filePath);
+  // 确保目录存在
+  const dir = path.dirname(filePath);
+  await fs.mkdir(dir, { recursive: true });
+  // 写入文件，格式化为 2 空格缩进
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  return backupPath;
+}
+
+/**
+ * PUT /api/claude-config/env
+ * 更新环境变量配置
+ * 接收 JSON body { env: {...} }，更新 ~/.claude/settings.json 的 env 字段
+ * 写入前自动备份原文件
+ */
+router.put('/env', async (req, res) => {
+  try {
+    const { env } = req.body;
+
+    // 验证请求体
+    if (env === undefined) {
+      return res.status(400).json({ error: '请求体必须包含 env 字段' });
+    }
+
+    if (typeof env !== 'object' || Array.isArray(env) || env === null) {
+      return res.status(400).json({ error: 'env 必须是一个对象' });
+    }
+
+    // 读取当前全局配置
+    const globalSettings = await readJsonFile(CONFIG_PATHS.globalSettings);
+
+    // 更新 env 字段
+    globalSettings.env = env;
+
+    // 写回文件（自动备份）
+    const backupPath = await writeJsonFile(CONFIG_PATHS.globalSettings, globalSettings);
+
+    // 读取项目配置并合并，返回完整配置
+    const projectConfig = await readJsonFile(CONFIG_PATHS.projectConfig);
+    const mergedConfig = deepMerge(globalSettings, projectConfig);
+
+    const response = {
+      ...mergedConfig,
+      env: mergedConfig.env || {},
+      mcpServers: mergedConfig.mcpServers || {},
+      _backup: backupPath // 返回备份文件路径（如果有）
+    };
+
+    res.json(response);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

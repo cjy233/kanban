@@ -346,7 +346,7 @@
     "id": 50,
     "category": "config-management",
     "description": "后端 API：PUT /api/claude-config/env 更新环境变量",
-    "passes": false,
+    "passes": true,
     "verification": ["可以更新 ANTHROPIC_MODEL 等环境变量", "写入前自动备份", "返回更新后的配置"]
   },
   {
