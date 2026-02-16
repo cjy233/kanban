@@ -28,38 +28,17 @@
 
 ### Current State
 - All 40 core features completed
-- New phase: Visual upgrade + Claude Code config management (features #41-58)
-- Design document: docs/plans/2026-02-16-visual-upgrade-config-management-design.md
-- Feature #41: 升级全局配色系统 - COMPLETED
-- Feature #42: 卡片组件升级 - COMPLETED
-- Feature #44: 表格组件升级 - COMPLETED
-- Feature #47: 加载状态骨架屏 shimmer 效果 - COMPLETED
-- Feature #48: 图表样式升级 - COMPLETED
-- Feature #49: 后端 API：GET /api/claude-config 获取合并配置 - COMPLETED
+- Visual upgrade + Claude Code config management phase completed
+- All 58 features now passing
 
-### Session 2026-02-16 (Feature #56)
-- 实现 ConfigPage MCP 服务器 Tab
-- 服务器列表显示（名称、命令、参数、来源标识）
-- 每行编辑/删除按钮（项目配置只读）
-- 添加服务器弹窗表单（name/command/args/env 字段）
-- 使用 ConfirmModal 替代原生 confirm() 保持 UX 一致性
-- 添加加载状态显示
-- Code review 通过，构建成功
-
-### Session 2026-02-16 (Feature #57)
-- 实现 ConfigPage CLAUDE.md Tab 集成 Monaco Editor
-- 新增 MonacoEditor.vue 组件封装
-- 文件选择器支持当前项目/全局/自定义路径
-- Monaco Editor 显示 Markdown 内容，语法高亮
-- 主题跟随系统亮暗切换（使用 MutationObserver 监听）
-- Ctrl+S 保存快捷键
-- 未保存状态指示（dirty indicator）
-- 切换路径时未保存警告弹窗
-- 自定义路径支持 Enter 键加载
+### Session 2026-02-16 (Feature #58)
+- 实现 ConfigPage 未保存离开提示功能
+- 环境变量 Tab 的未保存状态追踪（envDirty computed + envFormOriginal）
+- 切换 Tab 时检查未保存状态，弹出确认框
+- 离开页面时检查未保存状态（Vue Router onBeforeRouteLeave + beforeunload）
+- 使用 ConfirmModal 组件保持 UX 一致性
 - Code review 通过，构建成功
 
 ### Next Session Notes
-- Read this file and git log first
-- Run init.sh to verify environment
-- Start with Feature #58: 前端：未保存离开提示
-- 剩余 1 个 feature 未完成
+- 所有 58 个 feature 已完成
+- 可以开始新的功能规划或优化工作
