@@ -77,38 +77,14 @@ check_blocked() {
 build_prompt() {
   local fid="$1" fdesc="$2" left="$3"
   cat <<PROMPT
-继续下一个任务。
+继续下一个任务：$fdesc
 
-## 当前任务
-features.json 中 id=$fid："$fdesc"
-剩余未完成: $left
+还剩 $left 个功能。
+读 claude-progress.txt、features.json、源码，自行判断怎么做。
+完成后改 passes=true，commit，push，更新 progress。
+遇到问题自行调试，无法解决时创建 BLOCKED.md。
 
-## 上下文
-- 先读 claude-progress.txt 了解项目状态
-- 读 features.json 看还有哪些功能待完成
-- 读相关源码理解现有结构
-- 列出可用 MCP servers 和 tools
-
-## 怎么做
-根据当前代码和文档实际情况决定实现方式。
-- 改动尽量小
-- 完成后把 features.json 中 id=$fid 的 passes 改为 true
-- git add -A && git commit -m "feat(#$fid): $fdesc"
-- git push
-- 更新 claude-progress.txt
-
-## 遇到问题
-用 MCP tools、curl、浏览器等自行验证和调试。
-无法独立解决时创建 BLOCKED.md 描述需要你做什么。
-
-## 可用 Skills
-| 场景 | Skill |
-|------|-------|
-| UI 开发 | /frontend-design |
-| CSS 样式 | /style-design |
-| Bug 调试 | /problem-solver |
-| 复杂调试 | /superpowers:systematic-debugging |
-
+样式相关时调用 /style-design。
 PROMPT
 }
 
