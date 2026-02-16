@@ -56,21 +56,6 @@ for f in features:
 
 ts() { date '+%Y-%m-%d %H:%M:%S'; }
 
-check_blocked() {
-  if [ -f "BLOCKED.md" ]; then
-    echo ""
-    echo "╔══════════════════════════════════════════╗"
-    echo "║  ⚠ BLOCKED — 需要你的帮助                ║"
-    echo "╚══════════════════════════════════════════╝"
-    echo ""
-    cat BLOCKED.md
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "请按照上面的步骤处理完毕后，按回车继续..."
-    read -r
-    rm -f BLOCKED.md
-    echo "$(ts) BLOCKED.md 已清除，继续循环"
-  fi
 }
 
 # ── Build prompt ────────────────────────────────────────────────────
@@ -82,7 +67,7 @@ build_prompt() {
 还剩 $left 个功能。
 读 claude-progress.txt、features.json、源码，自行判断怎么做。
 完成后改 passes=true，commit，push，更新 progress。
-遇到问题自行调试，无法解决时创建 BLOCKED.md。
+遇到问题自行调试，无法解决时直接问我。
 
 样式相关时调用 /style-design。
 PROMPT
@@ -104,9 +89,6 @@ consecutive_fails=0
 session_num=0
 
 while true; do
-  # 检查是否有阻塞文件需要用户处理
-  check_blocked
-
   LEFT=$(remaining_features)
 
   if [ "$LEFT" = "0" ]; then
@@ -154,13 +136,6 @@ while true; do
   CLAUDE_EXIT=$?
   echo ""
   echo "  ⏹ Claude exited (code: $CLAUDE_EXIT)"
-
-  # 检查是否产生了阻塞文件
-  if [ -f "BLOCKED.md" ]; then
-    echo "  ⚠ Agent 遇到阻塞，需要你的帮助"
-    consecutive_fails=0  # 阻塞不算失败
-    continue             # 回到循环顶部，check_blocked 会处理
-  fi
 
   # ── Check progress ──
   NEW_LEFT=$(remaining_features)
