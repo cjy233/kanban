@@ -37,19 +37,17 @@
 - Feature #48: 图表样式升级 - COMPLETED
 - Feature #49: 后端 API：GET /api/claude-config 获取合并配置 - COMPLETED
 
-### Session 2026-02-16 (Feature #55)
-- 实现 ConfigPage 环境变量 Tab
-- Tab 导航（环境变量、MCP 服务器、CLAUDE.md）
-- 模型选择下拉框（4 个 Claude 模型选项）
-- API 地址输入框
-- API Token 脱敏显示，点击切换显示/隐藏
-- 超时时间输入框
-- 保存按钮调用 PUT /api/claude-config/env
-- 使用 Toast 组件替代 alert 提升用户体验
+### Session 2026-02-16 (Feature #56)
+- 实现 ConfigPage MCP 服务器 Tab
+- 服务器列表显示（名称、命令、参数、来源标识）
+- 每行编辑/删除按钮（项目配置只读）
+- 添加服务器弹窗表单（name/command/args/env 字段）
+- 使用 ConfirmModal 替代原生 confirm() 保持 UX 一致性
+- 添加加载状态显示
 - Code review 通过，构建成功
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Start with Feature #56: 前端：ConfigPage MCP 服务器 Tab
+- Start with Feature #57: 前端：ConfigPage CLAUDE.md Tab 集成 Monaco Editor
 - 注意：测试时不要真的修改配置文件，会影响 Claude Code 运行

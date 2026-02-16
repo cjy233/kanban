@@ -220,9 +220,58 @@
       </div>
     </div>
 
-    <!-- CLAUDE.md Tab（占位） -->
-    <div v-if="activeTab === 'claudemd'" class="tab-content">
-      <p class="placeholder-text">CLAUDE.md 编辑器（开发中）</p>
+    <!-- CLAUDE.md Tab -->
+    <div v-if="activeTab === 'claudemd'" class="tab-content claudemd-tab">
+      <!-- 文件选择器 -->
+      <div class="form-group">
+        <label class="form-label">文件路径</label>
+        <div class="path-selector">
+          <select v-model="claudemdPathType" class="form-select path-type-select">
+            <option value="project">当前项目 (./CLAUDE.md)</option>
+            <option value="global">全局 (~/.claude/CLAUDE.md)</option>
+            <option value="custom">自定义路径</option>
+          </select>
+          <input
+            v-if="claudemdPathType === 'custom'"
+            v-model="claudemdCustomPath"
+            type="text"
+            class="form-input custom-path-input"
+            placeholder="输入 .md 文件路径"
+            @blur="loadClaudeMd"
+            @keyup.enter="loadClaudeMd"
+          />
+        </div>
+      </div>
+
+      <!-- 编辑器区域 -->
+      <div class="editor-wrapper" :class="{ loading: claudemdLoading }">
+        <div v-if="claudemdLoading" class="editor-loading">
+          <span>加载中...</span>
+        </div>
+        <MonacoEditor
+          v-else
+          v-model="claudemdContent"
+          language="markdown"
+          :theme="editorTheme"
+          @save="saveClaudeMd"
+        />
+      </div>
+
+      <!-- 状态栏 -->
+      <div class="editor-status">
+        <span v-if="!claudemdExists" class="status-hint">文件不存在，保存后将创建</span>
+        <span v-else class="status-hint">{{ claudemdResolvedPath }}</span>
+        <div class="editor-actions">
+          <span v-if="claudemdDirty" class="dirty-indicator">● 未保存</span>
+          <button
+            class="btn btn-primary"
+            @click="saveClaudeMd"
+            :disabled="claudemdSaving"
+          >
+            {{ claudemdSaving ? '保存中...' : '保存 (Ctrl+S)' }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Toast 通知 -->
@@ -244,13 +293,24 @@
       @confirm="deleteMcpServer"
       @cancel="showMcpDeleteConfirm = false"
     />
+
+    <!-- CLAUDE.md 切换确认弹窗 -->
+    <ConfirmModal
+      v-model:show="showClaudemdSwitchConfirm"
+      title="未保存的更改"
+      message="当前文件有未保存的更改，切换后将丢失。确定要切换吗？"
+      confirm-text="切换"
+      @confirm="confirmSwitchClaudeMd"
+      @cancel="cancelSwitchClaudeMd"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import Toast from '../components/Toast.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
+import MonacoEditor from '../components/MonacoEditor.vue'
 
 // Tab 配置
 const tabs = [
@@ -301,6 +361,140 @@ const mcpForm = reactive({
   argsText: '',
   envText: ''
 })
+
+// CLAUDE.md 状态
+const claudemdPathType = ref('project')
+const claudemdCustomPath = ref('')
+const claudemdContent = ref('')
+const claudemdOriginalContent = ref('')
+const claudemdLoading = ref(false)
+const claudemdSaving = ref(false)
+const claudemdExists = ref(false)
+const claudemdResolvedPath = ref('')
+
+// 主题状态（响应式）
+const currentTheme = ref(document.documentElement.getAttribute('data-theme') || 'light')
+
+// 计算编辑器主题（跟随系统）
+const editorTheme = computed(() => {
+  return currentTheme.value === 'dark' ? 'vs-dark' : 'vs'
+})
+
+// 计算是否有未保存的更改
+const claudemdDirty = computed(() => {
+  return claudemdContent.value !== claudemdOriginalContent.value
+})
+
+// 获取当前选择的路径
+function getClaudeMdPath() {
+  switch (claudemdPathType.value) {
+    case 'project':
+      return './CLAUDE.md'
+    case 'global':
+      return '~/.claude/CLAUDE.md'
+    case 'custom':
+      return claudemdCustomPath.value
+    default:
+      return './CLAUDE.md'
+  }
+}
+
+// 切换确认弹窗状态
+const showClaudemdSwitchConfirm = ref(false)
+const previousPathType = ref('project')
+let skipNextWatch = false
+
+// 监听路径类型变化
+watch(claudemdPathType, (newValue, oldValue) => {
+  if (skipNextWatch) {
+    skipNextWatch = false
+    return
+  }
+  if (claudemdDirty.value) {
+    // 有未保存更改，显示确认弹窗
+    previousPathType.value = oldValue
+    showClaudemdSwitchConfirm.value = true
+  } else if (newValue !== 'custom') {
+    loadClaudeMd()
+  }
+})
+
+// 确认切换
+function confirmSwitchClaudeMd() {
+  showClaudemdSwitchConfirm.value = false
+  if (claudemdPathType.value !== 'custom') {
+    loadClaudeMd()
+  }
+}
+
+// 取消切换
+function cancelSwitchClaudeMd() {
+  // 恢复之前的路径类型
+  skipNextWatch = true
+  claudemdPathType.value = previousPathType.value
+  showClaudemdSwitchConfirm.value = false
+}
+
+// 加载 CLAUDE.md 文件
+async function loadClaudeMd() {
+  const filePath = getClaudeMdPath()
+  if (!filePath) return
+
+  claudemdLoading.value = true
+  try {
+    const res = await fetch(`/api/claude-config/claudemd?path=${encodeURIComponent(filePath)}`)
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error || '加载失败')
+    }
+    const data = await res.json()
+    claudemdContent.value = data.content || ''
+    claudemdOriginalContent.value = data.content || ''
+    claudemdExists.value = data.exists
+    claudemdResolvedPath.value = data.path || ''
+  } catch (err) {
+    showToast('加载 CLAUDE.md 失败: ' + err.message, 'error')
+    claudemdContent.value = ''
+    claudemdOriginalContent.value = ''
+    claudemdExists.value = false
+  } finally {
+    claudemdLoading.value = false
+  }
+}
+
+// 保存 CLAUDE.md 文件
+async function saveClaudeMd() {
+  const filePath = getClaudeMdPath()
+  if (!filePath) {
+    showToast('请输入文件路径', 'error')
+    return
+  }
+
+  claudemdSaving.value = true
+  try {
+    const res = await fetch('/api/claude-config/claudemd', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        path: filePath,
+        content: claudemdContent.value
+      })
+    })
+
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error || '保存失败')
+    }
+
+    claudemdOriginalContent.value = claudemdContent.value
+    claudemdExists.value = true
+    showToast('CLAUDE.md 已保存', 'success')
+  } catch (err) {
+    showToast('保存失败: ' + err.message, 'error')
+  } finally {
+    claudemdSaving.value = false
+  }
+}
 
 // 显示 Toast 通知
 function showToast(message, type = 'info') {
@@ -367,9 +561,29 @@ async function saveEnvConfig() {
   }
 }
 
+// 主题变化监听器
+let themeObserver = null
+
 onMounted(() => {
   loadConfig()
   loadMcpServers()
+  loadClaudeMd()
+
+  // 监听主题变化
+  themeObserver = new MutationObserver(() => {
+    currentTheme.value = document.documentElement.getAttribute('data-theme') || 'light'
+  })
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme']
+  })
+})
+
+onBeforeUnmount(() => {
+  if (themeObserver) {
+    themeObserver.disconnect()
+    themeObserver = null
+  }
 })
 
 // 加载 MCP 服务器列表
@@ -864,5 +1078,74 @@ async function deleteMcpServer() {
 
 .form-textarea::placeholder {
   color: var(--color-text-secondary);
+}
+
+/* CLAUDE.md Tab 样式 */
+.claudemd-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.path-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.path-type-select {
+  min-width: 200px;
+}
+
+.custom-path-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.editor-wrapper {
+  position: relative;
+  height: 450px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.editor-wrapper.loading {
+  background: var(--color-bg-subtle);
+}
+
+.editor-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.editor-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+}
+
+.status-hint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-family: monospace;
+}
+
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dirty-indicator {
+  color: var(--color-warning);
+  font-size: 13px;
+  font-weight: 500;
 }
 </style>
