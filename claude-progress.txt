@@ -37,17 +37,18 @@
 - Feature #48: 图表样式升级 - COMPLETED
 - Feature #49: 后端 API：GET /api/claude-config 获取合并配置 - COMPLETED
 
-### Session 2026-02-16 (Feature #50)
-- 在 backend/routes/claude-config.js 中实现 PUT /api/claude-config/env 接口
-- 新增 createBackup() 函数，在写入前自动备份原文件为 .bak
-- 修改 writeJsonFile() 函数，集成备份功能并返回备份路径
-- 接口验证请求体必须包含 env 字段且为对象类型
-- 返回合并后的完整配置，包含 _backup 字段指示备份路径
-- API 测试通过：更新环境变量、备份文件创建、返回更新后配置
+### Session 2026-02-16 (Feature #51)
+- 在 backend/routes/claude-config.js 中实现 MCP 服务器 CRUD 接口
+- GET /api/claude-config/mcp - 获取服务器列表，包含 source 字段区分来源
+- POST /api/claude-config/mcp - 创建新服务器，验证名称唯一性
+- PUT /api/claude-config/mcp/:name - 更新服务器配置，支持重命名
+- DELETE /api/claude-config/mcp/:name - 删除服务器
+- 所有写操作自动备份原文件
 - Code review 通过，无 Critical 问题
+- API 测试全部通过
 
 ### Next Session Notes
 - Read this file and git log first
 - Run init.sh to verify environment
-- Start with Feature #51: 后端 API：GET /api/claude-config/mcp 获取 MCP 服务器列表
+- Start with Feature #52: 后端 API：CLAUDE.md 读写接口
 - Reference design doc for API specifications

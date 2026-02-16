@@ -350,4 +350,144 @@ router.delete('/mcp/:name', async (req, res) => {
   }
 });
 
+// 允许访问的目录白名单
+const ALLOWED_BASES = [
+  os.homedir(),    // 用户主目录（~/.claude/ 等）
+  process.cwd()    // 当前工作目录（项目目录）
+];
+
+/**
+ * 验证 CLAUDE.md 文件路径
+ * @param {string} filePath - 文件路径
+ * @returns {object} - { valid: boolean, error?: string, resolvedPath?: string }
+ */
+function validateClaudeMdPath(filePath) {
+  if (!filePath || typeof filePath !== 'string') {
+    return { valid: false, error: '路径不能为空' };
+  }
+
+  // 防止路径遍历攻击：检查是否包含 ..
+  if (filePath.includes('..')) {
+    return { valid: false, error: '路径不能包含 ..' };
+  }
+
+  // 解析路径（支持 ~ 展开）
+  let resolvedPath = filePath;
+  if (resolvedPath.startsWith('~')) {
+    resolvedPath = path.join(os.homedir(), resolvedPath.slice(1));
+  }
+  resolvedPath = path.resolve(resolvedPath);
+
+  // 只允许 .md 文件
+  if (!resolvedPath.toLowerCase().endsWith('.md')) {
+    return { valid: false, error: '只允许读写 .md 文件' };
+  }
+
+  // 验证路径在允许的目录范围内
+  const isAllowed = ALLOWED_BASES.some(base => resolvedPath.startsWith(base + path.sep) || resolvedPath === base);
+  if (!isAllowed) {
+    return { valid: false, error: '路径不在允许的目录范围内' };
+  }
+
+  return { valid: true, resolvedPath };
+}
+
+/**
+ * 创建文本文件备份
+ * @param {string} filePath - 要备份的文件路径
+ * @returns {Promise<string|null>} - 备份文件路径，文件不存在返回 null
+ */
+async function backupTextFile(filePath) {
+  try {
+    await fs.access(filePath);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupPath = `${filePath}.${timestamp}.bak`;
+    await fs.copyFile(filePath, backupPath);
+    return backupPath;
+  } catch {
+    // 文件不存在，无需备份
+    return null;
+  }
+}
+
+/**
+ * GET /api/claude-config/claudemd
+ * 读取 CLAUDE.md 文件内容
+ * Query: path - 文件路径（支持 ~ 展开）
+ */
+router.get('/claudemd', async (req, res) => {
+  try {
+    const { path: filePath } = req.query;
+
+    // 验证路径
+    const validation = validateClaudeMdPath(filePath);
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    // 读取文件
+    try {
+      const content = await fs.readFile(validation.resolvedPath, 'utf-8');
+      res.json({
+        path: validation.resolvedPath,
+        content,
+        exists: true
+      });
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        // 文件不存在，返回空内容
+        res.json({
+          path: validation.resolvedPath,
+          content: '',
+          exists: false
+        });
+      } else {
+        throw err;
+      }
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * PUT /api/claude-config/claudemd
+ * 保存 CLAUDE.md 文件内容
+ * Body: { path: string, content: string }
+ */
+router.put('/claudemd', async (req, res) => {
+  try {
+    const { path: filePath, content } = req.body;
+
+    // 验证路径
+    const validation = validateClaudeMdPath(filePath);
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    // 验证内容
+    if (typeof content !== 'string') {
+      return res.status(400).json({ error: '内容必须是字符串' });
+    }
+
+    // 备份原文件
+    const backupPath = await backupTextFile(validation.resolvedPath);
+
+    // 确保目录存在
+    const dir = path.dirname(validation.resolvedPath);
+    await fs.mkdir(dir, { recursive: true });
+
+    // 写入文件
+    await fs.writeFile(validation.resolvedPath, content, 'utf-8');
+
+    res.json({
+      message: 'CLAUDE.md 已保存',
+      path: validation.resolvedPath,
+      _backup: backupPath
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

@@ -360,7 +360,7 @@
     "id": 52,
     "category": "config-management",
     "description": "后端 API：CLAUDE.md 读写接口",
-    "passes": false,
+    "passes": true,
     "verification": ["GET /api/claude-config/claudemd 读取指定路径文件", "PUT 保存文件内容", "路径校验只允许 .md 文件", "非法路径返回 400"]
   },
   {
